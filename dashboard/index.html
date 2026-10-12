@@ -215,6 +215,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
 .step-h p { margin: 2px 0 0; color: var(--ink-3); font-size: 14px; }
 .step-n { font-family: var(--f-display); font-stretch: 112%; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); padding: 4px 9px; border-radius: 4px; align-self: center; }
 details.sec-block { padding: 0; scroll-margin-top: 80px; }
+.step-h, .area-h { scroll-margin-top: 80px; }
 .mrow { scroll-margin-top: 90px; }
 details.sec-block > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 details.sec-block > summary::-webkit-details-marker { display: none; }
@@ -223,6 +224,44 @@ details.sec-block[open] > summary::before { transform: rotate(90deg); }
 details.sec-block > summary h3 { font-size: 17px; font-weight: 700; font-stretch: 95%; flex: 1 1 auto; min-width: 0; }
 details.sec-block > summary .q { color: var(--ink-3); font-size: 13px; }
 details.sec-block .metrics { padding: 0 18px 8px; }
+/* health areas */
+.area-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.acard { text-align: left; border: 1px solid var(--rule); background: var(--panel-2); border-radius: 8px; padding: 12px; display: grid; gap: 8px; cursor: pointer; align-content: start; min-width: 0; }
+.acard:hover { border-color: var(--ink-3); }
+.acard .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.acard .t { font-family: var(--f-display); font-weight: 700; font-stretch: 95%; font-size: 15px; min-width: 0; }
+.acard .c { font-size: 12.5px; color: var(--ink-2); }
+.acard .w { font-size: 12.5px; color: var(--ink-3); overflow-wrap: anywhere; }
+.acard .stack { height: 8px; }
+.area { display: grid; gap: 14px; scroll-margin-top: 80px; }
+.area-h { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 14px; border-top: 2px solid var(--ink); }
+.area-h .mini-dial { width: 72px; height: 44px; }
+.area-h .mini-dial text { font-size: 16px; }
+.area-h > div { flex: 1 1 240px; min-width: 0; }
+.area-h h2 { font-size: clamp(21px, 2.8vw, 26px); font-weight: 800; font-stretch: 90%; }
+.area-h p { margin: 2px 0 0; color: var(--ink-3); font-size: 14px; }
+.area-h .n { font-family: var(--f-display); font-stretch: 112%; font-weight: 700; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.area-h .counts { display: grid; gap: 6px; justify-items: end; min-width: 160px; }
+.area-h .counts .stack { width: 160px; height: 8px; }
+.area-h .counts span { font-size: 12.5px; color: var(--ink-2); }
+.area-body { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .area-body { grid-template-columns: 1fr; } }
+.area-body h4 { margin: 0 0 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.area-lists { display: grid; gap: 16px; }
+.unrated { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+.unrated b { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
+.unrated button { font: inherit; font-size: 12.5px; border: 1px dashed var(--rule); background: none; border-radius: 6px; padding: 4px 8px; color: var(--ink-2); cursor: pointer; }
+.unrated button small { color: var(--ink-3); margin-left: 4px; }
+.mini-acts { display: grid; gap: 4px; font-size: 13px; }
+.mini-acts .late { color: var(--bad); font-weight: 600; }
+details.area-detail { padding: 0; }
+details.area-detail > summary { list-style: none; cursor: pointer; padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--accent); }
+details.area-detail > summary::-webkit-details-marker { display: none; }
+details.area-detail > summary::before { content: "›"; font-size: 20px; line-height: 1; color: var(--ink-3); transition: transform .15s; }
+details.area-detail[open] > summary::before { transform: rotate(90deg); }
+details.area-detail .metrics { padding: 0 18px 8px; }
+.agenda button .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.attn-item.compact { padding: 7px 9px; }
 /* status wall */
 .wall { display: grid; gap: 14px; }
 .wall-sec { display: grid; gap: 6px; }
@@ -244,7 +283,7 @@ details.sec-block .metrics { padding: 0 18px 8px; }
 .wtile.none .v { color: var(--ink-3); font-weight: 500; }
 /* distance from target */
 .dist { display: grid; gap: 2px; }
-.drow { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 7.5rem; gap: 12px; align-items: center; padding: 3px 4px; border-radius: 4px; cursor: pointer; text-align: left; border: 0; background: none; width: 100%; }
+.drow { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 5.5rem; gap: 12px; align-items: center; padding: 3px 4px; border-radius: 4px; cursor: pointer; text-align: left; border: 0; background: none; width: 100%; }
 .drow:hover { background: var(--panel-2); }
 .drow .l { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .drow .l small { color: var(--ink-3); margin-left: 4px; }
@@ -257,7 +296,7 @@ details.sec-block .metrics { padding: 0 18px 8px; }
 .dbar.clip.pos { border-radius: 0; clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%); }
 .dbar.clip.neg { border-radius: 0; clip-path: polygon(6px 0, 100% 0, 100% 100%, 6px 100%, 0 50%); }
 .drow .p { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; text-align: right; white-space: nowrap; }
-.dscale { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 7.5rem; gap: 12px; padding: 0 4px 6px; }
+.dscale { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 5.5rem; gap: 12px; padding: 0 4px 6px; }
 .dscale div { position: relative; height: 14px; font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
 .dscale div span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .dscale .dhead { align-self: end; }
@@ -325,15 +364,10 @@ details.sec-block .metrics { padding: 0 18px 8px; }
   </div>
 
   <main id="view-cockpit" role="tabpanel" aria-labelledby="tab-cockpit" style="display:grid;gap:20px">
-    <nav class="agenda" aria-label="Cockpit sections">
-      <button data-jump="overview">Overview</button>
-      <button data-jump="step-scan"><b>1</b> Scan</button>
-      <button data-jump="step-discuss"><b>2–3</b> Discuss &amp; deep-dive</button>
-      <button data-jump="step-actions"><b>4</b> Assign actions</button>
-      <button data-jump="detail">Metric detail</button>
-    </nav>
+    <nav class="agenda" id="agenda" aria-label="Health areas"></nav>
 
-    <section class="overview" id="overview" aria-label="Overview">
+    <div id="overview" style="display:grid;gap:20px;scroll-margin-top:80px">
+    <section class="overview" aria-label="Overview">
       <div class="panel health">
         <div class="panel-h"><h2>Company health</h2><span id="rated-count"></span></div>
         <div class="health-head">
@@ -351,29 +385,16 @@ details.sec-block .metrics { padding: 0 18px 8px; }
       </div>
     </section>
 
-    <section class="step" id="step-scan">
-      <header class="step-h"><span class="step-n">Step 1</span><div><h2>Scan</h2><p>Every metric by section. Green needs no discussion.</p></div></header>
-      <div class="panel"><div class="wall" id="wall"></div></div>
-      <div class="panel">
-        <div class="panel-h"><h2>What's going well</h2><span>Furthest ahead of target, plus anything improving</span></div>
-        <div class="attn" id="going-well"></div>
-      </div>
-    </section>
+      <section class="panel" aria-labelledby="areas-h">
+        <div class="panel-h"><h2 id="areas-h">Health by area</h2><span>Click an area for its detail</span></div>
+        <div class="area-cards" id="area-cards"></div>
+      </section>
+    </div>
 
-    <section class="step" id="step-discuss">
-      <header class="step-h"><span class="step-n">Steps 2–3</span><div><h2>Discuss Yellow, deep-dive Red</h2><p>How far each metric is from target, then the list to work through.</p></div></header>
-      <div class="panel">
-        <div class="panel-h"><h2>Distance from target</h2><span>Right of center is ahead, left is behind. Bars stop at ±100%.</span></div>
-        <div class="dist" id="dist"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
-        <div class="attn" id="attention"></div>
-      </div>
-    </section>
+    <div id="areas" style="display:grid;gap:28px"></div>
 
     <section class="step" id="step-actions">
-      <header class="step-h"><span class="step-n">Step 4</span><div><h2>Assign actions</h2><p>Who will do what, by when. Overdue actions are listed first.</p></div></header>
+      <header class="step-h"><span class="step-n">All areas</span><div><h2>Actions</h2><p>Who will do what, by when. Overdue actions are listed first.</p></div></header>
       <div class="panel" id="actions-panel">
         <div class="panel-h"><h2>Actions</h2><span id="actions-sub"></span></div>
       <form id="action-form" class="action-form" autocomplete="off">
@@ -389,9 +410,8 @@ details.sec-block .metrics { padding: 0 18px 8px; }
       </div>
     </section>
 
-    <section class="step" id="detail">
-      <header class="step-h"><span class="step-n">Reference</span><div><h2>Metric detail</h2><p>Every metric with its method, readings and trend. Opens when you click a metric anywhere above.</p></div><button class="btn quiet" type="button" id="toggle-all">Expand all</button></header>
-      <div id="section-blocks" style="display:grid;gap:12px"></div>
+    <section class="step" id="blind-spots">
+      <header class="step-h"><span class="step-n">All areas</span><div><h2>Blind spots</h2><p>What the cockpit can't see yet.</p></div></header>
       <div class="panel">
         <div class="panel-h"><h2>Blind spots</h2><span>Metrics with no rating yet, and who owns getting one</span></div>
         <div class="blind" id="blind"></div>
@@ -846,29 +866,10 @@ details.sec-block .metrics { padding: 0 18px 8px; }
 
 
 
-    // attention
-    const flagged = [];
-    state.sections.forEach((s) => s.metrics.forEach((m) => { const e = evaluate(m); if (e.cls === "bad" || e.cls === "warn") flagged.push({ s, m, e }); }));
-    flagged.sort((a, b) => (a.e.cls === b.e.cls ? 0 : a.e.cls === "bad" ? -1 : 1));
-    renderGoingWell();
-    $("attention").innerHTML = flagged.length ? flagged.map(({ s, m, e }) => `
-      <button class="attn-item" data-jump="m-${esc(m.id)}">
-        ${chip(e)}
-        <span style="min-width:0"><span class="m">${esc(shortName(m.metric))}</span><br><span class="o">${esc(s.name)} · ${esc(m.owner || "Unassigned")}</span></span>
-        <span class="v num">${esc(show(m.value, m.format) || "–")}<small>target ${esc(shortTarget(m))}</small></span>
-      </button>`).join("") : `<p class="empty">Nothing is Red or Yellow. Scan Green and move on.</p>`;
-
-    // sections
-    $("section-blocks").innerHTML = state.sections.map((s, i) => {
-      const t = tally(s.metrics);
-      return `<details class="panel sec-block" id="sec-${esc(s.key)}" data-sec="${esc(s.key)}"${openSecs.has(s.key) ? " open" : ""}>
-        <summary>${miniDial(t.score)}<h3>${esc(s.name)} <span class="q">${esc(s.question)}</span></h3>${chip(sectionStatus(t))}<span class="q">${t.bad} red · ${t.warn} yellow · ${t.good} green</span></summary>
-        <div class="metrics">${s.metrics.map(metricRow).join("") || '<p class="empty">No metrics in this section yet.</p>'}</div>
-      </details>`;
-    }).join("");
-    renderBrief(all);
-    renderWall();
-    renderDistance();
+    renderAgenda();
+    renderAreaCards();
+    renderAreas();
+    renderBrief(all);    renderBrief(all);
     renderActions();
     renderHealthTrend();
     renderLeaders();
@@ -913,15 +914,66 @@ details.sec-block .metrics { padding: 0 18px 8px; }
     const cue = pct === 0 ? "Right on target" : m.direction === "Lower" ? `${pct}% under the ceiling` : `${pct}% ahead of target`;
     return dir && dir.cls === "up" ? `${cue}, and improving` : cue;
   }
-  function renderGoingWell() {
-    const all = wins(), w = showAllWins ? all : all.slice(0, 5);
-    const more = all.length > 5 ? `<button type="button" class="btn quiet" data-wins-toggle style="justify-self:start">${showAllWins ? "Show top 5" : `Show all ${all.length}`}</button>` : "";
-    $("going-well").innerHTML = w.length ? w.map((x) => `
-      <button class="attn-item" data-jump="m-${esc(x.m.id)}">
-        ${chip(x.kind === "improving" ? { cls: "good", status: "Improving" } : x.e)}
-        <span style="min-width:0"><span class="m">${esc(shortName(x.m.metric))}</span><br><span class="o">${esc(winLine(x))} · ${esc(x.m.owner || "Unassigned")}</span></span>
-        <span class="v num">${esc(show(x.m.value, x.m.format) || "–")}<small>target ${esc(shortTarget(x.m))}</small></span>
-      </button>`).join("") + more : `<p class="empty">Nothing is on target yet. Look for any metric that improved since the last reading.</p>`;
+  function areaVerdict(s) { return sectionStatus(tally(s.metrics)); }
+  function renderAgenda() {
+    const dot = (cls) => `<i class="dot bg-${cls === "warn" ? "warn" : cls}"></i>`;
+    $("agenda").innerHTML = `<button data-jump="overview">Overview</button>` +
+      state.sections.map((s) => `<button data-jump="area-${esc(s.key)}">${dot(areaVerdict(s).cls)}${esc(s.name)}</button>`).join("") +
+      `<button data-jump="step-actions">Actions</button><button data-jump="blind-spots">Blind spots</button>`;
+  }
+  function renderAreaCards() {
+    $("area-cards").innerHTML = state.sections.map((s) => {
+      const t = tally(s.metrics), v = sectionStatus(t);
+      const worst = s.metrics.map((m) => ({ m, e: evaluate(m) })).filter((x) => x.e.cls === "bad" || x.e.cls === "warn").sort((a, b) => (a.e.cls === b.e.cls ? severity(a.e) - severity(b.e) : a.e.cls === "bad" ? -1 : 1))[0];
+      return `<button class="acard" data-jump="area-${esc(s.key)}">
+        <div class="top"><span class="t">${esc(s.name)}</span>${miniDial(t.score)}</div>
+        <div>${chip(v)}</div>
+        <div class="stack">${stackHTML(t)}</div>
+        <span class="c">${t.bad} red · ${t.warn} yellow · ${t.good} green${t.none ? ` · ${t.none} unrated` : ""}</span>
+        <span class="w">${worst ? `Biggest issue: ${esc(shortName(worst.m.metric))}` : t.rated ? "Nothing off target" : "Nothing measured yet"}</span>
+      </button>`;
+    }).join("");
+  }
+  function itemHTML({ m, e }, line) {
+    return `<button class="attn-item compact" data-jump="m-${esc(m.id)}">
+      ${chip(e)}
+      <span style="min-width:0"><span class="m">${esc(shortName(m.metric))}</span><br><span class="o">${esc(line)}</span></span>
+      <span class="v num">${esc(show(m.value, m.format) || "–")}<small>target ${esc(shortTarget(m))}</small></span>
+    </button>`;
+  }
+  function renderAreas() {
+    $("areas").innerHTML = state.sections.map((s, i) => {
+      const t = tally(s.metrics), v = sectionStatus(t);
+      const items = s.metrics.map((m) => ({ s, m, e: evaluate(m), dir: direction(m, historyFor(m)) }));
+      const flagged = items.filter((x) => x.e.cls === "bad" || x.e.cls === "warn").sort((a, b) => (a.e.cls === b.e.cls ? severity(a.e) - severity(b.e) : a.e.cls === "bad" ? -1 : 1));
+      const good = items.filter((x) => x.e.cls === "good").sort((a, b) => (b.e.attain ?? 1) - (a.e.attain ?? 1));
+      const improving = items.filter((x) => x.e.cls !== "good" && x.e.cls !== "none" && x.dir && x.dir.cls === "up");
+      const unrated = items.filter((x) => x.e.cls === "none");
+      const acts = actions.filter((a) => a.status !== "done" && s.metrics.some((m) => m.id === a.metricId));
+      const attnLine = (x) => { const g = gapInfo(x.m, x.e); return [g ? g.short : "", x.m.owner || "Unassigned"].filter(Boolean).join(" · "); };
+      return `<section class="area" id="area-${esc(s.key)}">
+        <header class="area-h">${miniDial(t.score)}
+          <div><span class="n">Area ${i + 1} of ${state.sections.length}</span><h2>${esc(s.name)}</h2><p>${esc(s.question)}</p></div>
+          <div class="counts">${chip(v)}<div class="stack">${stackHTML(t)}</div><span>${t.bad} red · ${t.warn} yellow · ${t.good} green${t.none ? ` · ${t.none} unrated` : ""}</span></div>
+        </header>
+        <div class="area-body">
+          <div class="panel">
+            <div class="panel-h"><h2>Distance from target</h2><span>Left is behind, right is ahead</span></div>
+            ${distanceHTML(s.metrics)}
+            ${unrated.length ? `<div class="unrated"><b>No rating</b>${unrated.map((x) => `<button type="button" data-jump="m-${esc(x.m.id)}">${esc(shortName(x.m.metric))}<small>${esc(x.e.status === "hold" ? "On hold" : x.e.status)}</small></button>`).join("")}</div>` : ""}
+          </div>
+          <div class="panel area-lists">
+            <div><h4>Needs attention</h4><div class="attn">${flagged.length ? flagged.map((x) => itemHTML(x, attnLine(x))).join("") : '<p class="empty">Nothing Red or Yellow in this area.</p>'}</div></div>
+            <div><h4>Going well</h4><div class="attn">${good.length || improving.length ? good.map((x) => itemHTML(x, `${winLine({ ...x, kind: "ahead" })} · ${x.m.owner || "Unassigned"}`)).join("") + improving.map((x) => itemHTML({ m: x.m, e: { cls: "good", status: "Improving" } }, `${winLine({ ...x, kind: "improving" })} · ${x.m.owner || "Unassigned"}`)).join("") : '<p class="empty">Nothing on target yet in this area.</p>'}</div></div>
+            ${acts.length ? `<div><h4>Open actions</h4><div class="mini-acts">${acts.map((a) => `<span class="${isLate(a) ? "late" : ""}">${esc(a.text)} · ${esc(a.owner || "No owner")} · ${esc(dueHTML(a))}</span>`).join("")}</div></div>` : ""}
+          </div>
+        </div>
+        <details class="panel area-detail" data-sec="${esc(s.key)}"${openSecs.has(s.key) ? " open" : ""}>
+          <summary>All ${s.metrics.length} ${esc(s.name)} metrics: method, trend and readings</summary>
+          <div class="metrics">${s.metrics.map(metricRow).join("") || '<p class="empty">No metrics in this area yet.</p>'}</div>
+        </details>
+      </section>`;
+    }).join("");
   }
 
   function scoreColor(sc) { return sc == null ? "var(--none)" : sc >= 75 ? "var(--good)" : sc >= 50 ? "var(--warn-mark)" : "var(--bad)"; }
@@ -934,34 +986,22 @@ details.sec-block .metrics { padding: 0 18px 8px; }
       <text x="${cx}" y="${cy - 2}" text-anchor="middle">${sc ?? "–"}</text></svg>`;
   }
 
-  function renderWall() {
-    $("wall").innerHTML = state.sections.map((s) => {
-      const t = tally(s.metrics);
-      return `<div class="wall-sec"><h3>${miniDial(t.score)}<button type="button" data-jump="sec-${esc(s.key)}">${esc(s.name)}</button>${chip(sectionStatus(t))}</h3><div class="wall-tiles">${s.metrics.map((m) => {
-        const e = evaluate(m);
-        const v = show(m.value, m.format) || "–";
-        const label = `${shortName(m.metric)}: ${e.status === "hold" ? "On hold" : e.status}, ${v}`;
-        return `<button class="wtile ${e.cls}" data-jump="m-${esc(m.id)}" title="${esc(label + (shortTarget(m) !== "–" ? ` vs target ${shortTarget(m)}` : ""))}" aria-label="${esc(label)}">${ICON[e.cls]}<span class="n">${esc(shortName(m.metric))}</span><span class="v">${esc(v.length > 12 ? (e.status === "hold" ? "On hold" : e.status) : v)}</span></button>`;
-      }).join("")}</div></div>`;
-    }).join("");
-  }
-
   // Each scored metric as % ahead (+) or behind (−) target, oriented so right is always better.
-  function renderDistance() {
+  function distanceHTML(metrics) {
     const rows = [];
-    state.sections.forEach((s) => s.metrics.forEach((m) => {
+    metrics.forEach((m) => {
       const e = evaluate(m);
       if (!e.computed || !isFinite(e.v) || !isFinite(e.t) || e.t === 0) return;
       const p = (m.direction === "Higher" ? e.v - e.t : e.t - e.v) / Math.abs(e.t);
       rows.push({ m, e, p });
-    }));
+    });
     rows.sort((a, b) => a.p - b.p);
     const lim = 1, pos = (p) => 50 + (Math.max(-lim, Math.min(lim, p)) / lim) * 50;
     const ticks = [-1, -0.5, 0, 0.5, 1];
     const fill = { good: "var(--good)", warn: "var(--warn-mark)", bad: "var(--bad)" };
     const grid = ticks.filter((t) => t !== 0).map((t) => `<i class="grid" style="left:${pos(t)}%"></i>`).join("");
     const scale = `<div class="dscale"><span class="dhead">Behind ← → Ahead</span><div>${ticks.map((t) => `<span style="left:${pos(t)}%">${t > 0 ? "+" : t < 0 ? "−" : ""}${Math.abs(t * 100)}%</span>`).join("")}</div><span></span></div>`;
-    $("dist").innerHTML = rows.length ? scale + rows.map(({ m, e, p }) => {
+    return `<div class="dist">` + (rows.length ? scale + rows.map(({ m, e, p }) => {
       const w = Math.abs(pos(p) - 50), clip = Math.abs(p) > lim;
       const pct = `${p >= 0 ? "+" : "−"}${Math.abs(p * 100).toFixed(Math.abs(p) < 0.1 ? 1 : 0)}%`;
       return `<button class="drow" data-jump="m-${esc(m.id)}" title="${esc(`${shortName(m.metric)}: ${show(m.value, m.format)} vs ${shortTarget(m)} (${pct} ${p >= 0 ? "ahead of" : "behind"} target)`)}">
@@ -969,7 +1009,7 @@ details.sec-block .metrics { padding: 0 18px 8px; }
         <span class="dtrack">${grid}<i class="dbar ${p >= 0 ? "pos" : "neg"}${clip ? " clip" : ""}" style="width:${Math.max(w, 0.6)}%;background:${fill[e.cls]}"></i></span>
         <span class="p">${chipIcon(e)} ${esc(pct)}</span>
       </button>`;
-    }).join("") : `<p class="empty">No metrics can be compared to a numeric target yet.</p>`;
+    }).join("") : `<p class="empty">No metric in this area has a numeric target to compare against yet.</p>`) + `</div>`;
   }
   function chipIcon(e) { return `<span style="color:var(--${e.cls === "warn" ? "warn" : e.cls === "good" ? "good" : e.cls === "bad" ? "bad" : "none"});display:inline-flex;vertical-align:-1px">${ICON[e.cls].replace("<svg ", '<svg width="11" height="11" ')}</span>`; }
 
@@ -1198,19 +1238,10 @@ details.sec-block .metrics { padding: 0 18px 8px; }
     });
   }
 
-  $("going-well").addEventListener("click", (ev) => { if (ev.target.closest("[data-wins-toggle]")) { showAllWins = !showAllWins; renderGoingWell(); } });
-  $("section-blocks").addEventListener("toggle", (ev) => {
+  $("areas").addEventListener("toggle", (ev) => {
     const d = ev.target; if (!d.dataset || !d.dataset.sec) return;
     d.open ? openSecs.add(d.dataset.sec) : openSecs.delete(d.dataset.sec);
-    syncToggleAll();
   }, true);
-  function syncToggleAll() { $("toggle-all").textContent = openSecs.size === state.sections.length ? "Collapse all" : "Expand all"; }
-  $("toggle-all").addEventListener("click", () => {
-    const openAll = openSecs.size !== state.sections.length;
-    document.querySelectorAll("details.sec-block").forEach((d) => { d.open = openAll; });
-    state.sections.forEach((s) => (openAll ? openSecs.add(s.key) : openSecs.delete(s.key)));
-    syncToggleAll();
-  });
 
   /* ---------- tabs & jumps ---------- */
   function setTab(which) {
@@ -1249,9 +1280,9 @@ details.sec-block .metrics { padding: 0 18px 8px; }
     setTab("cockpit");
     const el = document.getElementById(j.dataset.jump);
     if (!el) return;
-    const d = el.matches("details") ? el : el.closest("details.sec-block");
+    const d = el.closest("details.area-detail");
     if (d && !d.open) { d.open = true; openSecs.add(d.dataset.sec); }
-    const top = ["overview", "step-scan", "step-discuss", "step-actions", "detail"].includes(el.id) || el.matches("details");
+    const top = el.id === "overview" || el.matches(".area, .step");
     el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: top ? "start" : "center" });
   });
 

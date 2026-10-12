@@ -12,6 +12,7 @@ A one-page health dashboard built from the **CEO Cockpit** tab of `v4_Crepes_Goa
 - A status picked by hand (for metrics with no number yet) overrides the rule.
 
 ## History, freshness and actions
+- The Cockpit is organized by the five health areas from the sheet. Each area has its score and verdict, a distance-from-target chart, what needs attention, what is going well, open actions, and a collapsible list of every metric with method, trend and readings.
 - Each "Save for everyone" records a dated snapshot (artifact database, `snapshots/<date>`). Trend lines and Improving/Worsening labels come from those snapshots, so they appear once a metric has two readings.
 - Every metric has an "as of" date. Editing a value stamps today; numbers older than the stale threshold (default 45 days) are flagged.
 - Actions (metric, owner, due date, done) are stored in `actions/<id>` and shared with everyone who can open the page.
