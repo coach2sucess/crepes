@@ -1,0 +1,749 @@
+<meta charset="utf-8">
+<title>Crêpes à Latte CEO Cockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an instrument panel. Health summary and attention list up top, then one gauge row per cockpit section; a second tab holds the editable sheet. */
+:root {
+  --bg: #eef0f2;
+  --panel: #ffffff;
+  --panel-2: #f6f7f8;
+  --ink: #1b2026;
+  --ink-2: #4a535d;
+  --ink-3: #6f7882;
+  --rule: #d9dde2;
+  --accent: #6b3f22;          /* espresso */
+  --accent-ink: #ffffff;
+  --accent-soft: #f1e7df;
+  --good: #1f7a4d;  --good-bg: #e3f2ea;
+  --warn: #9a6400;  --warn-bg: #fbf0d9; --warn-mark: #d99a18;
+  --bad: #b3261e;   --bad-bg: #fbe5e3;
+  --none: #6f7882;  --none-bg: #eceef1;
+  --track: #e6e9ec;
+  --focus: #2a6fdb;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161a; --panel: #1a1f25; --panel-2: #20262d; --ink: #e8ebee; --ink-2: #b4bcc4; --ink-3: #8a939c;
+    --rule: #2e353d; --accent: #d9a877; --accent-ink: #1b140e; --accent-soft: #2e251d;
+    --good: #5cc48d; --good-bg: #173226; --warn: #e8b64c; --warn-bg: #352a12; --warn-mark: #e8b64c;
+    --bad: #f08079; --bad-bg: #3a1c1a; --none: #8a939c; --none-bg: #262c33; --track: #2a3038; --focus: #7aa7ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161a; --panel: #1a1f25; --panel-2: #20262d; --ink: #e8ebee; --ink-2: #b4bcc4; --ink-3: #8a939c;
+  --rule: #2e353d; --accent: #d9a877; --accent-ink: #1b140e; --accent-soft: #2e251d;
+  --good: #5cc48d; --good-bg: #173226; --warn: #e8b64c; --warn-bg: #352a12; --warn-mark: #e8b64c;
+  --bad: #f08079; --bad-bg: #3a1c1a; --none: #8a939c; --none-bg: #262c33; --track: #2a3038; --focus: #7aa7ff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.brand { display: grid; gap: 2px; min-width: 0; }
+.eyebrow { font-family: var(--f-display); font-stretch: 112%; font-weight: 600; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.brand h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; font-stretch: 88%; letter-spacing: -.01em; }
+.brand p { margin: 0; color: var(--ink-3); font-size: 13px; }
+.tabs { display: inline-flex; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 3px; gap: 2px; }
+.tabs button { border: 0; background: transparent; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; color: var(--ink-2); }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+
+/* save bar */
+.savebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 14px; border-radius: 8px; background: var(--accent-soft); border: 1px solid var(--rule); }
+.savebar p { margin: 0; flex: 1 1 260px; min-width: 0; font-size: 14px; }
+.btn { border: 1px solid var(--rule); background: var(--panel); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; white-space: nowrap; }
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.quiet { background: transparent; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* panels */
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; min-width: 0; }
+.panel-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
+.panel-h h2 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+.panel-h span { color: var(--ink-3); font-size: 13px; }
+
+/* summary */
+.summary { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; }
+@media (max-width: 860px) { .summary { grid-template-columns: 1fr; } }
+.health { display: grid; gap: 16px; align-content: start; }
+.health-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.dial { width: 132px; max-width: 100%; flex: none; }
+.dial text { fill: var(--ink); }
+.verdict { display: grid; gap: 4px; min-width: 0; flex: 1 1 160px; }
+.verdict .big { font-family: var(--f-display); font-weight: 800; font-stretch: 90%; font-size: 26px; line-height: 1.1; }
+.verdict p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.stack { display: flex; height: 14px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--panel); }
+.stack i { display: block; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.bg-good { background: var(--good); } .bg-warn { background: var(--warn-mark); } .bg-bad { background: var(--bad); } .bg-none { background: var(--track); }
+
+.sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.sec-tile { text-align: left; border: 1px solid var(--rule); background: var(--panel-2); border-radius: 8px; padding: 12px; display: grid; gap: 8px; cursor: pointer; align-content: start; }
+.sec-tile:hover { border-color: var(--ink-3); }
+.sec-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.sec-tile .t { font-family: var(--f-display); font-weight: 700; font-stretch: 95%; font-size: 15px; }
+.sec-tile .q { font-size: 12.5px; color: var(--ink-3); }
+.sec-tile .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sec-tile .stack { height: 8px; }
+
+/* chips */
+.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; letter-spacing: .01em; }
+.chip svg { width: 11px; height: 11px; flex: none; }
+.chip.good { color: var(--good); background: var(--good-bg); }
+.chip.warn { color: var(--warn); background: var(--warn-bg); }
+.chip.bad { color: var(--bad); background: var(--bad-bg); }
+.chip.none { color: var(--none); background: var(--none-bg); }
+
+/* attention list */
+.attn { display: grid; gap: 6px; }
+.attn-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 9px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel-2); cursor: pointer; text-align: left; width: 100%; }
+.attn-item:hover { border-color: var(--ink-3); }
+.attn-item .m { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.attn-item .o { font-size: 12.5px; color: var(--ink-3); }
+.attn-item .v { text-align: right; font-size: 13px; max-width: 16ch; }
+@media (max-width: 520px) { .attn-item { grid-template-columns: auto minmax(0, 1fr); } .attn-item .v { grid-column: 2; text-align: left; max-width: none; } .attn-item .v small { display: inline; margin-left: 6px; } }
+.attn-item .v small { display: block; color: var(--ink-3); font-size: 12px; }
+.empty { color: var(--ink-3); font-size: 14px; padding: 8px 0; }
+
+/* section detail */
+.sec-block .panel-h h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.metrics { display: grid; gap: 0; }
+.mrow { display: grid; grid-template-columns: 112px minmax(0, 2.2fr) minmax(0, 1.2fr) minmax(0, 1.6fr) 28px; gap: 6px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--rule); }
+.mrow:first-child { border-top: 0; }
+.mrow .name { font-weight: 500; overflow-wrap: anywhere; }
+.mrow .name small { display: block; color: var(--ink-3); font-weight: 400; font-size: 12.5px; margin-top: 2px; }
+.mrow .val { display: grid; gap: 1px; }
+.mrow .val b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; }
+.mrow .val span { color: var(--ink-3); font-size: 12.5px; overflow-wrap: anywhere; }
+.trend { font-size: 18px; text-align: center; color: var(--ink-2); }
+.bullet { display: grid; gap: 4px; min-width: 0; }
+.bullet svg { width: 100%; height: 18px; display: block; overflow: visible; }
+.bullet .cap { font-size: 12px; color: var(--ink-3); }
+@media (max-width: 760px) {
+  .mrow { grid-template-columns: minmax(0, 1fr) auto; }
+  .mrow .name { grid-column: 1 / -1; order: -1; }
+  .mrow .bullet { grid-column: 1 / -1; }
+  .mrow .trend { display: none; }
+}
+
+/* editor */
+.edit-intro { display: grid; gap: 14px; }
+.edit-intro p { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.bands { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.field { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); min-width: 0; }
+.field input, .field select { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; color: var(--ink); }
+.toolrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; }
+table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-size: 13.5px; }
+.sheet th { text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); background: var(--panel-2); padding: 8px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; }
+.sheet td { padding: 4px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.sheet tr.sec-row td { background: var(--accent-soft); font-family: var(--f-display); font-weight: 700; padding: 8px; }
+.sheet tr.sec-row td span { font-family: var(--f-body); font-weight: 400; color: var(--ink-3); margin-left: 8px; font-size: 13px; }
+.sheet input, .sheet select { width: 100%; border: 1px solid transparent; background: transparent; border-radius: 4px; padding: 6px; color: var(--ink); min-width: 0; }
+.sheet input:hover, .sheet select:hover { border-color: var(--rule); }
+.sheet input:focus, .sheet select:focus { border-color: var(--focus); background: var(--panel); outline: none; }
+.sheet input.numcell { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.sheet td.out { white-space: nowrap; padding-inline: 8px; }
+.icon-btn { border: 0; background: transparent; cursor: pointer; color: var(--ink-3); padding: 4px 6px; border-radius: 4px; }
+.icon-btn:hover { color: var(--bad); background: var(--bad-bg); }
+.add-btn { border: 0; background: transparent; color: var(--accent); cursor: pointer; font-weight: 600; padding: 6px 8px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 14px; max-width: calc(100% - 32px); z-index: 10; }
+.foot { color: var(--ink-3); font-size: 12.5px; display: grid; gap: 4px; }
+.foot p { margin: 0; max-width: 90ch; }
+@media (prefers-reduced-motion: no-preference) { .stack i, .bullet rect.fill { transition: width .35s ease; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Crêpes à Latte · Leadership</div>
+      <h1>CEO Cockpit</h1>
+      <p id="asof"></p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="View">
+      <button id="tab-cockpit" role="tab" aria-selected="true" aria-controls="view-cockpit">Cockpit</button>
+      <button id="tab-edit" role="tab" aria-selected="false" aria-controls="view-edit">Edit the sheet</button>
+    </div>
+  </header>
+
+  <div id="savebar" class="savebar" hidden>
+    <p id="save-msg">You have unsaved changes. The cockpit already shows them.</p>
+    <button class="btn quiet" id="btn-discard">Discard changes</button>
+    <button class="btn primary" id="btn-save">Save for everyone</button>
+  </div>
+
+  <main id="view-cockpit" role="tabpanel" aria-labelledby="tab-cockpit" style="display:grid;gap:20px">
+    <section class="summary">
+      <div class="panel health">
+        <div class="panel-h"><h2>Company health</h2><span id="rated-count"></span></div>
+        <div class="health-head">
+          <svg class="dial" id="dial" viewBox="0 0 132 80" role="img" aria-label="Health score"></svg>
+          <div class="verdict"><div class="big" id="verdict"></div><p id="verdict-sub"></p></div>
+        </div>
+        <div class="stack" id="overall-stack" aria-hidden="true"></div>
+        <div class="legend" id="overall-legend"></div>
+        <div class="sections" id="section-tiles"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
+        <div class="attn" id="attention"></div>
+      </div>
+    </section>
+    <div id="section-blocks" style="display:grid;gap:20px"></div>
+    <div class="foot">
+      <p id="rule-note"></p>
+      <p>Meeting format: scan Green quickly, discuss Yellow, deep-dive Red, assign actions. Target: under 30 minutes.</p>
+    </div>
+  </main>
+
+  <main id="view-edit" role="tabpanel" aria-labelledby="tab-edit" hidden style="display:grid;gap:20px">
+    <section class="panel edit-intro">
+      <div class="panel-h" style="margin:0"><h2>CEO Cockpit sheet</h2><span>Edits update the cockpit as you type</span></div>
+      <p>Type a new current value or target and the status recalculates with the same rules as the workbook. Leave Status on <b>Auto</b> to let the numbers decide, or pick a status by hand for metrics that have no number yet.</p>
+      <div class="bands">
+        <label class="field" for="band-std">Standard yellow band (% short of target before Red)
+          <input id="band-std" type="number" min="0" max="100" step="1" class="num"></label>
+        <label class="field" for="band-alt">Alternate band (revenue, erosion, organic growth, reviews)
+          <input id="band-alt" type="number" min="0" max="100" step="1" class="num"></label>
+        <label class="field" for="asof-input">Data as of
+          <input id="asof-input" type="date"></label>
+      </div>
+      <div class="toolrow">
+        <button class="btn" id="btn-import">Import updated .xlsx</button>
+        <input type="file" id="file-import" accept=".xlsx,.xlsm,.xls" hidden>
+        <button class="btn" id="btn-export">Download as .xlsx</button>
+        <span id="io-msg" style="font-size:13px;color:var(--ink-3)"></span>
+      </div>
+    </section>
+    <div class="tablewrap">
+      <table class="sheet" id="sheet">
+        <thead><tr>
+          <th style="width:23%">Metric</th><th style="width:10%">Current value</th><th style="width:12%">Target</th>
+          <th style="width:8%">Format</th><th style="width:7.5%">Direction</th><th style="width:7.5%">Band</th>
+          <th style="width:9.5%">Status</th><th style="width:6%">Result</th><th style="width:9%">Accountable</th><th>Notes</th><th style="width:34px"></th>
+        </tr></thead>
+        <tbody id="sheet-body"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script type="application/json" id="seed">{"workbook": "v4_Crepes_Goals_Dashboard", "asOf": "2026-10-12", "bandStd": 0.2, "bandAlt": 0.5, "sections": [{"key": "financial", "name": "Financial Health", "question": "Is the company making money and managing cash?", "metrics": [{"metric": "Revenue vs Plan (YTD)", "value": 8542409, "target": 8459120, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "usd", "auto": true, "id": "r5"}, {"metric": "Gross Margin %", "value": 0.526, "target": 0.52, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "pct", "auto": true, "id": "r6"}, {"metric": "Cash Availability (Minimum Threshold)", "value": 2500000, "target": 1000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Current", "format": "usd", "auto": true, "id": "r7"}, {"metric": "Free Cash Flow (Target: TTM > $0)", "value": "TTM<0", "target": 0, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "", "owner": "Jamie Cusick", "note": "", "format": "usd", "auto": true, "id": "r8"}, {"metric": "Month-End Close (Target: ≤8 days)", "value": 10, "target": 8, "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "9/15/2026", "format": "days", "auto": true, "id": "r9"}]}, {"key": "growth", "name": "Growth Engine", "question": "Is future revenue healthy?", "metrics": [{"metric": "Pipeline Coverage Ratio (Net New $2M + Renewal $15M @ 1.5x)", "value": 16303701, "target": 17000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r13"}, {"metric": "Proposal Win Rate (New)", "value": 0.3, "target": 0.3, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r14"}, {"metric": "Qualified Leads / Month (Target: 40+)", "value": 6, "target": 40, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "num", "auto": true, "id": "r15"}, {"metric": "Sales Cycle Length (Target: -15% vs Baseline)", "value": "TBD", "target": -0.15, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "Yellow", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r16"}, {"metric": "Net New Revenue (3 buckets: LS $550K | Non-LS $250K | Café Lines $150K)", "value": 524250, "target": 950000, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r17"}]}, {"key": "client", "name": "Client Health", "question": "Are current clients staying and growing?", "metrics": [{"metric": "Revenue Erosion -- Total Ceiling (Target: ≤$700K Total | ≤$300K Controllable)", "value": "$1,763,754.00", "target": "$700,000 total | $300,000 controllable, on the CORE book", "direction": "Lower", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "CORE book · National · parent level · won in 2024, 2025 AND 2026 · full year", "format": "usd", "auto": true, "id": "r21"}, {"metric": "Proposal Win Rate (Existing)", "value": "66.78%", "target": "80% on the CORE book", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Starts at PROPOSAL · existing logos, parent level · National", "format": "pct", "auto": true, "id": "r22"}, {"metric": "Organic Growth (Existing Accounts) (Target: $600K Annual | $150K/Qtr)", "value": "$895,002.00", "target": "$600,000 annual", "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "existing business · same client and same show, won in both years", "format": "usd", "auto": true, "id": "r23"}, {"metric": "Client Health Score / NPS (Target: Baseline +10%)", "value": "Not measured", "target": "", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "", "note": "metric not on the board", "format": "num", "auto": true, "id": "r24"}, {"metric": "At-Risk Clients Flagged (Target: 0 Unexpected)", "value": "8", "target": "0 unexpected (not comparable to the flagged count)", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "target is zero UNEXPECTED, not zero flagged", "format": "num", "auto": false, "id": "r25"}, {"metric": "Bi-Annual Account Reviews Done (Target: 100%)", "value": 0.5, "target": 1, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "ANNUAL cadence · 2026 complete", "format": "pct", "auto": true, "id": "r26"}, {"metric": "Avg Deal Value (Target: +10–12%)", "value": "11.70%", "target": "+10 to 12%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "National only · all clients, new and existing", "format": "pct", "auto": true, "id": "r27"}, {"metric": "Time to Close, Existing Accounts (Target: ≤90 days)", "value": "150 days", "target": "90 days or fewer", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Agreed start: SUGGESTED OR ABOVE · shown start: CREATION · National · parent level", "format": "days", "auto": true, "id": "r28"}]}, {"key": "ops", "name": "Operational Execution", "question": "Are events delivered reliably?", "metrics": [{"metric": "Service Disruption (Target: ≤5%)", "value": "Not measured", "target": "95% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · read-out flipped to reliability 27 Aug · Smartsheet tracker", "format": "pct", "auto": true, "id": "r32"}, {"metric": "Order / Pick Accuracy (Q4 Target)", "value": "99.59%", "target": "98%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "pick AND pack errors combined · crate level · from the single WH Error Log", "format": "pct", "auto": true, "id": "r33"}, {"metric": "PSM Accuracy at Receipt (Q4 Target: 97%+)", "value": "89.08%", "target": "97% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Troy Heldt", "note": "Asana · Bob's Pick Reviews · by DATE SENT · not-yet-due and pending excluded", "format": "pct", "auto": true, "id": "r34"}, {"metric": "CSAT / Client Satisfaction", "value": "Not measured", "target": "4.5 out of 5", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · no instrument yet", "format": "num", "auto": true, "id": "r35"}, {"metric": "Post-Show Report ≤72h", "value": "Not measured", "target": "100%", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · Smartsheet tracker", "format": "pct", "auto": true, "id": "r36"}, {"metric": "Service Document Approval  [new, replaces PSM Document Accuracy]", "value": "57.00%", "target": "no target set", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "No target", "owner": "Troy Heldt", "note": "documents ON FILE · 128-service catalogue · approval read from Box file names", "format": "pct", "auto": true, "id": "r37"}]}, {"key": "people", "name": "People & Capacity", "question": "Can we deliver at scale?", "metrics": [{"metric": "Enterprise Training / Learning path", "value": "TBD", "target": "See Projects", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "10/1/2026", "format": "text", "auto": true, "id": "r41"}, {"metric": "SOP Coverage", "value": 0.2, "target": 0.5, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "", "format": "pct", "auto": true, "id": "r42"}, {"metric": "Employee Satisfication Score", "value": "TBD", "target": 3.5, "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "10/1/2026", "format": "num", "auto": true, "id": "r43"}, {"metric": "Employee Retention/Voluntary Turnover", "value": 0.95, "target": 0.95, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Donovan", "note": "10/1/2026", "format": "pct", "auto": true, "id": "r44"}]}]}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  const DATA_FILE = "cockpit-data.json";
+  const DRAFT_KEY = "crepes-cockpit-draft";
+  const MANUAL = ["Green", "Yellow", "Red", "Pending", "Not measured", "hold", "No target"];
+  const FORMATS = { usd: "$", pct: "%", num: "#", days: "days", text: "text" };
+
+  let published = null;   // last saved state (JSON string)
+  let state = null;       // working state
+  let artifactApi;        // undefined = not asked yet, null = unavailable
+  let readOnly = false;
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} },
+  };
+
+  /* ---------- numbers ---------- */
+  function parseNum(v) {
+    if (typeof v === "number") return v;
+    const s = String(v ?? "").trim();
+    const m = s.match(/^([+\-−])?\s*\$?\s*([\d,]*\.?\d+)\s*(%)?/);
+    if (!m) return NaN;
+    let n = parseFloat(m[2].replace(/,/g, ""));
+    if (!isFinite(n)) return NaN;
+    if (m[1] === "-" || m[1] === "−") n = -n;
+    if (m[3] || (s.includes("%") && /^[+\-−]?\s*[\d.]+\s*(to|-|–)/.test(s))) n = n / 100;
+    return n;
+  }
+  function fmt(n, f) {
+    if (!isFinite(n)) return "";
+    if (f === "usd") {
+      const a = Math.abs(n);
+      const s = a >= 1e6 ? "$" + (a / 1e6).toFixed(2) + "M" : a >= 1e4 ? "$" + Math.round(a / 1e3) + "K" : "$" + a.toLocaleString("en-US");
+      return (n < 0 ? "−" : "") + s;
+    }
+    if (f === "pct") { const p = n * 100; return (Math.abs(p - Math.round(p)) < 0.05 ? Math.round(p) : p.toFixed(1)) + "%"; }
+    if (f === "days") return n.toLocaleString("en-US") + " days";
+    return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  }
+  const show = (raw, f) => { const n = parseNum(raw); return typeof raw === "number" || (isFinite(n) && /^[\s$+\-−\d.,%]+$/.test(String(raw).replace(/days?/i, ""))) ? fmt(n, f) : String(raw ?? ""); };
+
+  /* ---------- the workbook's status rule ---------- */
+  function evaluate(m) {
+    const v = parseNum(m.value), t = parseNum(m.target);
+    const band = m.band === "alt" ? state.bandAlt : state.bandStd;
+    const dir = m.direction;
+    const computable = m.auto !== false && isFinite(v) && isFinite(t) && (dir === "Higher" || dir === "Lower");
+    let status = "Pending", trend = "—", computed = false;
+    if (computable) {
+      computed = true;
+      if (dir === "Higher") status = v >= t ? "Green" : v >= t * (1 - band) ? "Yellow" : "Red";
+      else status = v <= t ? "Green" : v <= t * (1 + band) ? "Yellow" : "Red";
+      trend = { Green: "↑", Yellow: "→", Red: "↓" }[status];
+    }
+    if (m.statusOverride) { status = m.statusOverride; computed = false; }
+    if (m.trendOverride) trend = m.trendOverride;
+    const cls = status === "Green" ? "good" : status === "Yellow" ? "warn" : status === "Red" ? "bad" : "none";
+    let attain = null;
+    if (computable && t > 0 && v > 0) attain = dir === "Higher" ? v / t : t / v;
+    const yellowAt = dir === "Higher" ? 1 - band : 1 / (1 + band);
+    return { v, t, status, cls, trend, computed, attain, yellowAt, band };
+  }
+
+  const ICON = {
+    good: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3l2.3 2.2 4.7-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    warn: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5l4.8 8.6H1.2z" fill="currentColor"/></svg>',
+    bad: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    none: '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 1.6"/></svg>',
+  };
+  const chip = (e) => `<span class="chip ${e.cls}">${ICON[e.cls]}${esc(e.status === "hold" ? "On hold" : e.status)}</span>`;
+
+  function tally(metrics) {
+    const c = { good: 0, warn: 0, bad: 0, none: 0 };
+    metrics.forEach((m) => c[evaluate(m).cls]++);
+    const rated = c.good + c.warn + c.bad;
+    const score = rated ? Math.round(((c.good + 0.5 * c.warn) / rated) * 100) : null;
+    return { ...c, rated, total: metrics.length, score };
+  }
+  const stackHTML = (c) => {
+    const parts = [["good", "bg-good"], ["warn", "bg-warn"], ["bad", "bg-bad"], ["none", "bg-none"]];
+    return parts.filter(([k]) => c[k]).map(([k, b]) => `<i class="${b}" style="width:${(c[k] / c.total) * 100}%"></i>`).join("");
+  };
+
+  /* ---------- cockpit render ---------- */
+  function renderCockpit() {
+    const all = state.sections.flatMap((s) => s.metrics);
+    const c = tally(all);
+    const d = state.asOf ? new Date(state.asOf + "T12:00:00") : null;
+    $("asof").textContent = (d && !isNaN(d) ? "Data as of " + d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + " · " : "") + all.length + " metrics across " + state.sections.length + " sections";
+    $("rated-count").textContent = `${c.rated} of ${c.total} metrics have a rating`;
+
+    // dial: semicircle, 0–100
+    const score = c.score ?? 0, r = 54, cx = 66, cy = 66;
+    const ang = Math.PI * (1 - score / 100);
+    const x = cx + r * Math.cos(ang), y = cy - r * Math.sin(ang);
+    const col = c.score == null ? "var(--none)" : score >= 75 ? "var(--good)" : score >= 50 ? "var(--warn-mark)" : "var(--bad)";
+    $("dial").innerHTML = `
+      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="var(--track)" stroke-width="12" stroke-linecap="round"/>
+      ${c.score ? `<path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${x.toFixed(2)} ${y.toFixed(2)}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"/>` : ""}
+      <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="600" font-size="26">${c.score ?? "–"}</text>
+      <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" fill="var(--ink-3)" style="fill:var(--ink-3)">HEALTH / 100</text>`;
+    $("dial").setAttribute("aria-label", `Health score ${c.score ?? "not available"} out of 100`);
+    $("verdict").textContent = c.score == null ? "No ratings yet" : c.bad >= 4 || score < 50 ? "Off course" : c.bad > 0 || score < 75 ? "Flying, with warnings" : "On course";
+    $("verdict-sub").textContent = `${c.bad} red, ${c.warn} yellow, ${c.good} green. ${c.none} not yet measured or on hold.`;
+    $("overall-stack").innerHTML = stackHTML(c);
+    $("overall-legend").innerHTML = [["bg-good", "Green", c.good], ["bg-warn", "Yellow", c.warn], ["bg-bad", "Red", c.bad], ["bg-none", "No rating", c.none]]
+      .map(([b, l, n]) => `<span><i class="sw ${b}"></i>${l} <b class="num">${n}</b></span>`).join("");
+
+    $("section-tiles").innerHTML = state.sections.map((s) => {
+      const t = tally(s.metrics);
+      const e = t.rated === 0 ? { cls: "none", status: "No data" } : t.bad ? { cls: "bad", status: "Red" } : t.warn ? { cls: "warn", status: "Watch" } : { cls: "good", status: "On track" };
+      return `<button class="sec-tile" data-jump="sec-${esc(s.key)}">
+        <div class="row"><span class="t">${esc(s.name)}</span>${chip(e)}</div>
+        <div class="stack">${stackHTML(t)}</div>
+        <div class="row"><span class="q">${esc(s.question)}</span></div>
+        <div class="row" style="font-size:12.5px;color:var(--ink-2)"><span>${t.bad} red · ${t.warn} yellow · ${t.good} green</span><span class="num">${t.score ?? "–"}</span></div>
+      </button>`;
+    }).join("");
+
+    // attention
+    const flagged = [];
+    state.sections.forEach((s) => s.metrics.forEach((m) => { const e = evaluate(m); if (e.cls === "bad" || e.cls === "warn") flagged.push({ s, m, e }); }));
+    flagged.sort((a, b) => (a.e.cls === b.e.cls ? 0 : a.e.cls === "bad" ? -1 : 1));
+    $("attention").innerHTML = flagged.length ? flagged.map(({ s, m, e }) => `
+      <button class="attn-item" data-jump="m-${esc(m.id)}">
+        ${chip(e)}
+        <span style="min-width:0"><span class="m">${esc(shortName(m.metric))}</span><br><span class="o">${esc(s.name)} · ${esc(m.owner || "Unassigned")}</span></span>
+        <span class="v num">${esc(show(m.value, m.format) || "–")}<small>target ${esc(shortTarget(m))}</small></span>
+      </button>`).join("") : `<p class="empty">Nothing is Red or Yellow. Scan Green and move on.</p>`;
+
+    // sections
+    $("section-blocks").innerHTML = state.sections.map((s, i) => {
+      const t = tally(s.metrics);
+      return `<section class="panel sec-block" id="sec-${esc(s.key)}">
+        <div class="panel-h"><h2><span>${i + 1}. ${esc(s.name)}</span></h2><span>${esc(s.question)} · score <b class="num">${t.score ?? "–"}</b></span></div>
+        <div class="metrics">${s.metrics.map(metricRow).join("") || '<p class="empty">No metrics in this section yet.</p>'}</div>
+      </section>`;
+    }).join("");
+    $("rule-note").textContent = `Status rule from the workbook: at or better than target is Green; within ${Math.round(state.bandStd * 100)}% of target is Yellow (${Math.round(state.bandAlt * 100)}% for revenue, erosion, organic growth and account reviews); beyond that is Red. Trend arrows follow the same rule: ↑ on target, → inside the band, ↓ outside it.`;
+  }
+
+  function shortTarget(m) { const t = parseNum(m.target); if (isFinite(t) && m.auto !== false) return fmt(t, m.format); const s = show(m.target, m.format); return s ? (s.length > 22 ? s.slice(0, 20) + "…" : s) : "–"; }
+  function shortName(name) { return String(name).replace(/\s*\((Target|Q4 Target|3 buckets|Net New)[^)]*\)\s*$/i, "").replace(/\s*\[[^\]]*\]\s*/g, " ").trim(); }
+  function subName(name) { const m = String(name).match(/\(([^)]*)\)\s*$/); return m && /Target|bucket|Net New/i.test(m[1]) ? m[1] : ""; }
+
+  function metricRow(m) {
+    const e = evaluate(m);
+    const val = show(m.value, m.format) || "–";
+    const tgt = show(m.target, m.format);
+    let delta = "";
+    if (e.computed || (isFinite(e.v) && isFinite(e.t) && m.auto !== false && m.direction)) {
+      if (e.t !== 0) {
+        const pct = ((e.v - e.t) / Math.abs(e.t)) * 100;
+        delta = `${pct >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}% vs target`;
+      }
+    }
+    return `<div class="mrow" id="m-${esc(m.id)}">
+      <div>${chip(e)}</div>
+      <div class="name">${esc(shortName(m.metric))}${subName(m.metric) || m.note ? `<small>${esc([subName(m.metric), m.note].filter(Boolean).join(" · "))}</small>` : ""}</div>
+      <div class="val"><b>${esc(val)}</b><span>Target ${esc(tgt || "not set")}</span></div>
+      <div class="bullet">${bullet(e, m)}<span class="cap">${esc([delta, m.owner].filter(Boolean).join(" · ") || m.owner || "")}</span></div>
+      <div class="trend" title="Trend">${esc(e.trend)}</div>
+    </div>`;
+  }
+
+  // Attainment bar: 0–150% of target on one scale; tick at 100%, faint band where Yellow starts.
+  function bullet(e, m) {
+    if (e.attain == null) {
+      return `<svg viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="5" width="300" height="8" rx="4" fill="var(--track)"/></svg>`;
+    }
+    const W = 300, max = 1.5, sx = (a) => Math.max(0, Math.min(a, max)) / max * W;
+    const fill = e.cls === "good" ? "var(--good)" : e.cls === "warn" ? "var(--warn-mark)" : "var(--bad)";
+    const over = e.attain > max;
+    const label = `${Math.round(e.attain * 100)}% of ${m.direction === "Lower" ? "ceiling met" : "target"}`;
+    return `<svg viewBox="0 0 ${W} 18" preserveAspectRatio="none" role="img" aria-label="${esc(label)}">
+      <title>${esc(label)}</title>
+      <rect x="0" y="5" width="${W}" height="8" rx="4" fill="var(--track)"/>
+      <rect x="${sx(e.yellowAt)}" y="5" width="${sx(1) - sx(e.yellowAt)}" height="8" fill="var(--warn-bg)"/>
+      <rect class="fill" x="0" y="5" width="${Math.max(4, sx(e.attain))}" height="8" rx="4" fill="${fill}"/>
+      ${over ? `<path d="M${W - 6} 4 L${W} 9 L${W - 6} 14" fill="none" stroke="var(--panel)" stroke-width="2"/>` : ""}
+      <rect x="${sx(1) - 1}" y="1" width="2" height="16" fill="var(--ink)"/>
+    </svg>`;
+  }
+
+  /* ---------- editor render ---------- */
+  function opt(v, label, cur) { return `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(label)}</option>`; }
+  function renderEditor() {
+    $("band-std").value = Math.round(state.bandStd * 100);
+    $("band-alt").value = Math.round(state.bandAlt * 100);
+    $("asof-input").value = state.asOf || "";
+    $("sheet-body").innerHTML = state.sections.map((s, si) => `
+      <tr class="sec-row"><td colspan="11">Section ${si + 1}: ${esc(s.name)}<span>${esc(s.question)}</span></td></tr>
+      ${s.metrics.map((m, mi) => {
+        const id = `${si}-${mi}`;
+        const statusVal = m.auto === false && !m.statusOverride ? "__off" : m.statusOverride || "";
+        return `<tr data-s="${si}" data-m="${mi}">
+          <td><input id="metric-${id}" data-k="metric" value="${esc(m.metric)}" aria-label="Metric name"></td>
+          <td><input id="value-${id}" data-k="value" class="numcell" value="${esc(m.value)}" aria-label="Current value for ${esc(shortName(m.metric))}"></td>
+          <td><input id="target-${id}" data-k="target" class="numcell" value="${esc(m.target)}" aria-label="Target for ${esc(shortName(m.metric))}"></td>
+          <td><select id="format-${id}" data-k="format" aria-label="Number format">${Object.entries({ usd: "Dollars", pct: "Percent", num: "Number", days: "Days", text: "Text" }).map(([k, l]) => opt(k, l, m.format)).join("")}</select></td>
+          <td><select id="direction-${id}" data-k="direction" aria-label="Better when">${opt("Higher", "Higher", m.direction)}${opt("Lower", "Lower", m.direction)}${opt("", "–", m.direction)}</select></td>
+          <td><select id="band-${id}" data-k="band" aria-label="Tolerance band">${opt("std", "Standard", m.band)}${opt("alt", "Alternate", m.band)}</select></td>
+          <td><select id="status-${id}" data-k="status" aria-label="Status">${opt("", "Auto", statusVal)}${MANUAL.map((x) => opt(x, x === "hold" ? "On hold" : x, statusVal)).join("")}${opt("__off", "Pending (don't compare)", statusVal)}</select></td>
+          <td class="out" data-out>${chip(evaluate(m))}</td>
+          <td><input id="owner-${id}" data-k="owner" value="${esc(m.owner)}" aria-label="Accountable"></td>
+          <td><input id="note-${id}" data-k="note" value="${esc(m.note)}" aria-label="Notes"></td>
+          <td><button class="icon-btn" data-del title="Remove metric" aria-label="Remove ${esc(shortName(m.metric))}">✕</button></td>
+        </tr>`;
+      }).join("")}
+      <tr><td colspan="11"><button class="add-btn" data-add="${si}">+ Add metric to ${esc(s.name)}</button></td></tr>`).join("");
+  }
+
+  /* ---------- state changes ---------- */
+  const dirty = () => JSON.stringify(state) !== published;
+  function changed({ rerenderEditor = false } = {}) {
+    renderCockpit();
+    if (rerenderEditor) renderEditor();
+    const d = dirty();
+    $("savebar").hidden = !d;
+    if (d) store.set(DRAFT_KEY, JSON.stringify({ base: published, data: state }));
+    else store.del(DRAFT_KEY);
+  }
+
+  $("sheet-body").addEventListener("input", (ev) => {
+    const el = ev.target, tr = el.closest("tr[data-s]");
+    if (!tr || !el.dataset.k) return;
+    const m = state.sections[+tr.dataset.s].metrics[+tr.dataset.m];
+    const k = el.dataset.k;
+    if (k === "status") {
+      m.auto = el.value !== "__off";
+      m.statusOverride = el.value === "__off" ? "" : el.value;
+      if (!m.statusOverride) m.trendOverride = "";
+    } else if (k === "value" || k === "target") {
+      const raw = el.value.trim();
+      const n = parseNum(raw);
+      m[k] = raw !== "" && /^[\s$+\-−\d.,]+$/.test(raw) && isFinite(n) ? n : raw;
+      if (m.format === "pct" && typeof m[k] === "number" && Math.abs(m[k]) > 1.5) m[k] = m[k] / 100; // "52" in a percent row means 52%
+    } else m[k] = el.value;
+    tr.querySelector("[data-out]").innerHTML = chip(evaluate(m));
+    changed();
+  });
+  $("sheet-body").addEventListener("change", (ev) => {
+    // normalise displayed numbers once the field is left
+    const el = ev.target, tr = el.closest("tr[data-s]");
+    if (!tr || (el.dataset.k !== "value" && el.dataset.k !== "target")) return;
+    const m = state.sections[+tr.dataset.s].metrics[+tr.dataset.m];
+    el.value = m[el.dataset.k];
+  });
+  $("sheet-body").addEventListener("click", (ev) => {
+    const add = ev.target.closest("[data-add]");
+    if (add) {
+      const s = state.sections[+add.dataset.add];
+      s.metrics.push({ id: "n" + Date.now().toString(36), metric: "New metric", value: "", target: "", direction: "Higher", band: "std", trendOverride: "", statusOverride: "", owner: "", note: "", format: "num", auto: true });
+      changed({ rerenderEditor: true });
+      const rows = document.querySelectorAll(`tr[data-s="${add.dataset.add}"]`);
+      rows[rows.length - 1]?.querySelector("input")?.select();
+      return;
+    }
+    const del = ev.target.closest("[data-del]");
+    if (del) {
+      const tr = del.closest("tr[data-s]");
+      const m = state.sections[+tr.dataset.s].metrics.splice(+tr.dataset.m, 1)[0];
+      changed({ rerenderEditor: true });
+      toast(`Removed “${shortName(m.metric)}”. Discard changes to bring it back.`);
+    }
+  });
+  $("band-std").addEventListener("input", (e) => { const n = parseFloat(e.target.value); if (isFinite(n)) { state.bandStd = n / 100; changed(); refreshChips(); } });
+  $("band-alt").addEventListener("input", (e) => { const n = parseFloat(e.target.value); if (isFinite(n)) { state.bandAlt = n / 100; changed(); refreshChips(); } });
+  $("asof-input").addEventListener("input", (e) => { state.asOf = e.target.value; changed(); });
+  function refreshChips() {
+    document.querySelectorAll("#sheet-body tr[data-s]").forEach((tr) => {
+      tr.querySelector("[data-out]").innerHTML = chip(evaluate(state.sections[+tr.dataset.s].metrics[+tr.dataset.m]));
+    });
+  }
+
+  /* ---------- tabs & jumps ---------- */
+  function setTab(which) {
+    const edit = which === "edit";
+    $("tab-cockpit").setAttribute("aria-selected", String(!edit));
+    $("tab-edit").setAttribute("aria-selected", String(edit));
+    $("view-cockpit").hidden = edit;
+    $("view-edit").hidden = !edit;
+    store.set("crepes-cockpit-tab", which);
+  }
+  $("tab-cockpit").addEventListener("click", () => setTab("cockpit"));
+  $("tab-edit").addEventListener("click", () => setTab("edit"));
+  document.addEventListener("click", (ev) => {
+    const j = ev.target.closest("[data-jump]");
+    if (!j) return;
+    const el = document.getElementById(j.dataset.jump);
+    if (el) { el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); }
+  });
+
+  /* ---------- save ---------- */
+  let toastT;
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 4200); }
+  async function getArtifact() {
+    if (artifactApi !== undefined) return artifactApi;
+    try { artifactApi = window.claude?.use ? await window.claude.use("artifact") : null; } catch { artifactApi = null; }
+    return artifactApi;
+  }
+  $("btn-discard").addEventListener("click", () => {
+    state = JSON.parse(published);
+    store.del(DRAFT_KEY);
+    changed({ rerenderEditor: true });
+    toast("Changes discarded.");
+  });
+  $("btn-save").addEventListener("click", async () => {
+    const btn = $("btn-save");
+    if (readOnly) return;
+    btn.disabled = true; btn.textContent = "Saving…";
+    const api = await getArtifact();
+    const body = JSON.stringify(state, null, 1);
+    if (!api) {
+      published = JSON.stringify(state);
+      store.set("crepes-cockpit-local", body);
+      changed();
+      toast("Saved in this browser. Open the published cockpit to save for everyone.");
+    } else {
+      try {
+        await api.publish({ [DATA_FILE]: { content: body, contentType: "application/json" } });
+        published = JSON.stringify(state);
+        changed();
+        toast("Saved. Everyone opening the cockpit now sees these numbers.");
+      } catch (err) {
+        const code = err?.code;
+        if (code === "conflict") { toast("Someone saved a newer version. Loading it now."); }
+        else if (["not_writer", "not_granted", "not_declared", "consent_required", "capability_disabled", "capability_removed"].includes(code)) {
+          readOnly = true;
+          $("save-msg").textContent = "You can view this cockpit but not save it. Your edits stay in this browser only.";
+          btn.hidden = true;
+        } else if (code === "rate_limited") toast("Saving too often. Wait a moment, then save again.");
+        else toast("The save didn't go through. Your edits are kept here; try Save again.");
+      }
+    }
+    btn.disabled = false; btn.textContent = "Save for everyone";
+  });
+
+  /* ---------- xlsx import / export ---------- */
+  function guessFormat(cell, prev) {
+    if (prev) return prev;
+    const z = (cell && cell.z) || "", v = cell ? cell.v : "";
+    if (/%/.test(z) || /%\s*$/.test(String(v))) return "pct";
+    if (/\$/.test(z) || /^\s*\$/.test(String(v))) return "usd";
+    if (/days?/i.test(String(v))) return "days";
+    return typeof v === "number" ? "num" : "text";
+  }
+  function importWorkbook(buf) {
+    if (!window.XLSX) throw new Error("The spreadsheet reader didn't load. Check your connection and reload the page.");
+    const wb = XLSX.read(buf, { type: "array", cellFormula: true, cellNF: true, cellDates: true });
+    const name = wb.SheetNames.find((n) => /cockpit/i.test(n)) || wb.SheetNames[0];
+    const ws = wb.Sheets[name];
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    const cell = (r, c) => ws[XLSX.utils.encode_cell({ r, c })];
+    const val = (r, c) => { const x = cell(r, c); if (!x) return ""; if (x.v instanceof Date) return x.v.toLocaleDateString("en-US"); return x.v ?? ""; };
+    const byName = new Map(state.sections.flatMap((s) => s.metrics).map((m) => [String(m.metric).trim().toLowerCase(), m]));
+    const out = { ...state, sections: [] };
+    let sec = null;
+    for (let r = range.s.r; r <= range.e.r; r++) {
+      const a = String(val(r, 0)).trim();
+      const h = String(val(r, 7));
+      if (/^ASSUMPTION - Yellow/i.test(h) && isFinite(parseNum(val(r, 9)))) out.bandStd = parseNum(val(r, 9));
+      if (/^ASSUMPTION - Alternate/i.test(h) && isFinite(parseNum(val(r, 9)))) out.bandAlt = parseNum(val(r, 9));
+      if (!a) continue;
+      const sm = a.match(/^SECTION\s*\d+\s*[-–:]\s*([^|]+?)\s*(?:\|\s*(.*))?$/i);
+      if (sm) {
+        const nm = sm[1].trim().toLowerCase().replace(/(^|\s|&)\S/g, (x) => x.toUpperCase()).replace(/\bAnd\b/, "and");
+        const prior = state.sections.find((s) => s.name.toLowerCase() === sm[1].trim().toLowerCase());
+        sec = { key: prior?.key || nm.toLowerCase().replace(/[^a-z]+/g, "-"), name: prior?.name || nm, question: (sm[2] || prior?.question || "").trim(), metrics: [] };
+        out.sections.push(sec);
+        continue;
+      }
+      if (!sec || /^metric$/i.test(a) || /^(COLOR KEY|MEETING FORMAT)/i.test(a)) { if (/^COLOR KEY/i.test(a)) sec = null; continue; }
+      const prev = byName.get(a.toLowerCase());
+      const dC = cell(r, 3), eC = cell(r, 4);
+      const value = val(r, 1), target = val(r, 2);
+      sec.metrics.push({
+        id: prev?.id || "x" + r,
+        metric: a, value, target,
+        direction: String(val(r, 9) || ""),
+        band: eC?.f ? (/\$J\$48/.test(eC.f) ? "alt" : "std") : prev?.band || "std",
+        trendOverride: dC?.f ? "" : String(dC?.v ?? ""),
+        statusOverride: eC?.f ? "" : String(eC?.v ?? ""),
+        owner: String(val(r, 5) || ""),
+        note: [val(r, 6), val(r, 7), val(r, 10)].filter((x) => x !== "" && x != null).join(" · "),
+        format: guessFormat(cell(r, 1), prev?.format),
+        auto: prev ? prev.auto !== false : true,
+      });
+      // A typed status next to numbers the rule can judge: let the numbers decide, as the cockpit does.
+      const m = sec.metrics[sec.metrics.length - 1];
+      if (m.statusOverride && /^(Green|Yellow|Red)$/.test(m.statusOverride) && isFinite(parseNum(m.value)) && isFinite(parseNum(m.target)) && m.direction && m.auto) { m.statusOverride = ""; m.trendOverride = ""; }
+    }
+    if (!out.sections.length || !out.sections.some((s) => s.metrics.length)) throw new Error(`No cockpit sections found on the “${name}” tab. Use the CEO Cockpit tab layout: SECTION rows, then Metric, Current Value, Target… columns.`);
+    return { data: out, sheet: name };
+  }
+  $("btn-import").addEventListener("click", () => $("file-import").click());
+  $("file-import").addEventListener("change", async (ev) => {
+    const f = ev.target.files[0];
+    ev.target.value = "";
+    if (!f) return;
+    try {
+      const { data, sheet } = importWorkbook(await f.arrayBuffer());
+      state = data;
+      changed({ rerenderEditor: true });
+      const n = data.sections.reduce((a, s) => a + s.metrics.length, 0);
+      $("io-msg").textContent = `Loaded ${n} metrics from “${sheet}” in ${f.name}. Review, then Save for everyone.`;
+    } catch (err) {
+      $("io-msg").textContent = err.message || "That file couldn't be read as a spreadsheet.";
+    }
+  });
+
+  function exportWorkbook() {
+    const rows = [], formulas = [], fmts = [];
+    const put = (r, c, v) => { (rows[r] ||= [])[c] = v; };
+    put(0, 0, "CRÊPES À LATTE - CEO COCKPIT DASHBOARD");
+    put(1, 0, "AIRPLANE COCKPIT VIEW - High-level signals only. If something turns red, leadership dives into Department KPIs and 47 Buckets to find root cause.");
+    let r = 2;
+    const zfor = (f) => (f === "pct" ? "0.0%" : f === "usd" ? '"$"#,##0' : "General");
+    state.sections.forEach((s, i) => {
+      put(r++, 0, `SECTION ${i + 1} - ${s.name.toUpperCase()}   |   ${s.question}`);
+      ["Metric", "Current Value", "Target", "Trend", "Status", "Accountable", "", "Notes", "", "Direction"].forEach((h, c) => h && put(r, c, h));
+      r++;
+      s.metrics.forEach((m) => {
+        const row = r + 1; // 1-based for formulas
+        const v = parseNum(m.value), t = parseNum(m.target);
+        const comparable = m.auto !== false && isFinite(v) && isFinite(t) && m.direction && !m.statusOverride;
+        put(r, 0, m.metric);
+        put(r, 1, comparable ? v : m.value);
+        put(r, 2, comparable ? t : m.target);
+        if (comparable) {
+          fmts.push([r, 1, zfor(m.format)], [r, 2, zfor(m.format)]);
+          const b = m.band === "alt" ? "$J$BANDALT" : "$J$BANDSTD";
+          formulas.push([r, 3, `IF(NOT(ISNUMBER(B${row})),"—",IF($J${row}="Higher",IF(B${row}>=C${row},"↑",IF(B${row}>=C${row}*(1-${b}),"→","↓")),IF(B${row}<=C${row},"↑",IF(B${row}<=C${row}*(1+${b}),"→","↓"))))`]);
+          formulas.push([r, 4, `IF(NOT(ISNUMBER(B${row})),"Pending",IF($J${row}="Higher",IF(B${row}>=C${row},"Green",IF(B${row}>=C${row}*(1-${b}),"Yellow","Red")),IF(B${row}<=C${row},"Green",IF(B${row}<=C${row}*(1+${b}),"Yellow","Red"))))`]);
+        } else {
+          const e = evaluate(m);
+          put(r, 3, e.trend); put(r, 4, e.status);
+        }
+        put(r, 5, m.owner);
+        const extra = comparable && typeof m.target === "string" ? m.target : "";
+        put(r, 7, [m.note, extra && `Target as written: ${extra}`].filter(Boolean).join(" · "));
+        put(r, 9, m.direction);
+        r++;
+      });
+      r++;
+    });
+    const stdRow = r + 1, altRow = r + 2;
+    put(r, 0, "COLOR KEY:   Green = On Track   Yellow = Watch / At Risk   Red = Leadership Discussion Required   |   TREND: ↑ Improving   → Stable   ↓ Declining");
+    put(r, 7, "ASSUMPTION - Yellow Tolerance Band (% of target that still shows Yellow before Red):"); put(r, 9, state.bandStd);
+    put(r + 1, 0, "MEETING FORMAT:  Step 1 - Scan Green quickly  |  Step 2 - Discuss Yellow  |  Step 3 - Deep dive Red  |  Step 4 - Assign actions  |  Target: under 30 minutes");
+    put(r + 1, 7, "ASSUMPTION - Alternate Tolerance Band (Revenue vs Plan, Net New Revenue, Revenue Erosion, Organic Growth, Bi-Annual Reviews):"); put(r + 1, 9, state.bandAlt);
+    for (let i = 0; i < rows.length; i++) rows[i] ||= [];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    formulas.forEach(([rr, c, f]) => { ws[XLSX.utils.encode_cell({ r: rr, c })] = { t: "s", f: f.replaceAll("BANDSTD", stdRow).replaceAll("BANDALT", altRow) }; });
+    fmts.forEach(([rr, c, z]) => { const x = ws[XLSX.utils.encode_cell({ r: rr, c })]; if (x) x.z = z; });
+    ws["!cols"] = [{ wch: 60 }, { wch: 16 }, { wch: 22 }, { wch: 7 }, { wch: 12 }, { wch: 18 }, { wch: 4 }, { wch: 50 }, { wch: 4 }, { wch: 10 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "CEO Cockpit");
+    return XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  }
+  $("btn-export").addEventListener("click", async () => {
+    if (!window.XLSX) { $("io-msg").textContent = "The spreadsheet writer didn't load. Reload the page and try again."; return; }
+    const data = exportWorkbook();
+    const filename = `CEO_Cockpit_${state.asOf || "export"}.xlsx`;
+    let dl = null;
+    try { dl = window.claude?.use ? await window.claude.use("downloads") : null; } catch {}
+    try {
+      if (dl) { const res = await dl.save({ filename, data: new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }) }); $("io-msg").textContent = res?.status === "saved" ? `Downloaded ${filename}.` : ""; }
+      else { XLSX.writeFile(XLSX.read(data, { type: "array" }), filename); }
+    } catch (err) {
+      $("io-msg").textContent = err?.code === "declined" || err?.code === "cancelled" ? "Download cancelled." : "Downloads aren't available in this view.";
+    }
+  });
+
+  /* ---------- boot ---------- */
+  async function load() {
+    let data = null;
+    try { const res = await fetch(DATA_FILE, { cache: "no-store" }); if (res.ok) data = await res.json(); } catch {}
+    if (!data) { try { data = JSON.parse(store.get("crepes-cockpit-local") || "null"); } catch {} }
+    if (!data) data = JSON.parse($("seed").textContent);
+    published = JSON.stringify(data);
+    state = JSON.parse(published);
+    try {
+      const draft = JSON.parse(store.get(DRAFT_KEY) || "null");
+      if (draft && draft.base === published) state = draft.data;
+      else store.del(DRAFT_KEY);
+    } catch {}
+    renderEditor();
+    changed();
+    const tab = store.get("crepes-cockpit-tab");
+    if (tab === "edit" || location.hash === "#edit") setTab("edit");
+  }
+  load();
+})();
+</script>
