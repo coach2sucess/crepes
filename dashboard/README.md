@@ -2,7 +2,7 @@
 
 A one-page health dashboard built from the **CEO Cockpit** tab of `v4_Crepes_Goals_Dashboard.xlsx`.
 
-- `index.html` – the dashboard. **Cockpit** tab shows the health score, Red/Yellow attention list and every section. **Edit the sheet** tab is an editable grid; every change recalculates statuses immediately.
+- `index.html` – the dashboard, prepared for Robin Cardoso (President). **Cockpit** opens with a plain-language bottom line, then the health score, Red/Yellow attention list, every section (each metric has a "How it's measured" drill-down with thresholds, exact figures and source) and blind spots. **By leader** groups metrics by accountable leader for 1:1 prep. **Update data** is the editable grid; every change recalculates statuses immediately.
 - `cockpit-data.json` – the metrics the page loads (current value, target, direction, tolerance band, owner, notes).
 
 ## Status rule (same as the workbook)
