@@ -1056,8 +1056,6 @@ details.area-detail .metrics { padding: 0 18px 8px; }
       const lateMine = actions.filter((a) => isLate(a) && (a.owner || "Unassigned") === name).length;
       const talk = lateMine ? `Ask about ${lateMine} overdue ${lateMine === 1 ? "action" : "actions"} first. ` + (worst ? `Then ${shortName(worst.m.metric)}.` : "") : worst ? `Start with ${shortName(worst.m.metric)}.${unmeasured ? ` Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : ""}`
         : unmeasured ? `Nothing off target. Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : "Everything on target. Recognize it.";
-      const best = list.filter((x) => x.e.cls === "good").sort((a, b) => (b.e.attain ?? 1) - (a.e.attain ?? 1))[0];
-      const credit = best && worst ? `Recognize first: ${shortName(best.m.metric)} is ${winLine({ ...best, dir: direction(best.m, historyFor(best.m)), kind: "ahead" }).toLowerCase()}. ` : "";
       return `<section class="panel leader">
         <div class="panel-h" style="margin-bottom:8px"><h3>${esc(name)}</h3><span class="num">${t.score ?? "–"}</span></div>
         <div class="sub">${esc(secs)} · ${t.bad} red · ${t.warn} yellow · ${t.good} green${t.none ? ` · ${t.none} unrated` : ""}</div>
@@ -1067,7 +1065,7 @@ details.area-detail .metrics { padding: 0 18px 8px; }
           return `<li>${chip(e)}<span class="m">${esc(shortName(m.metric))}</span><span class="d">${esc(show(m.value, m.format) || "–")} vs ${esc(shortTarget(m))}${g ? " · " + esc(g.short) : ""}</span></li>`;
         }).join("")}</ul>
         ${(() => { const mine = actions.filter((a) => a.status !== "done" && (a.owner || "Unassigned") === name); return mine.length ? `<div class="acts"><b>Open actions</b>${mine.map((a) => `<span class="${isLate(a) ? "late" : ""}">${esc(a.text)} · ${esc(dueHTML(a))}</span>`).join("")}</div>` : ""; })()}
-        <div class="talk">${esc(credit + talk)}</div>
+        <div class="talk">${esc(talk)}</div>
       </section>`;
     }).join("");
   }
