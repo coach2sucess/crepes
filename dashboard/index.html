@@ -406,7 +406,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
 
     $("section-tiles").innerHTML = state.sections.map((s) => {
       const t = tally(s.metrics);
-      const e = t.rated === 0 ? { cls: "none", status: "No data" } : t.bad ? { cls: "bad", status: "Red" } : t.warn ? { cls: "warn", status: "Watch" } : { cls: "good", status: "On track" };
+      const e = sectionStatus(t);
       return `<button class="sec-tile" data-jump="sec-${esc(s.key)}">
         <div class="row"><span class="t">${esc(s.name)}</span>${chip(e)}</div>
         <div class="stack">${stackHTML(t)}</div>
@@ -439,7 +439,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     const blind = [];
     state.sections.forEach((s) => s.metrics.forEach((m) => { if (evaluate(m).cls === "none") blind.push(m); }));
     $("blind").innerHTML = blind.length ? blind.map((m) => `<span>${esc(shortName(m.metric))}<small>${esc(m.owner || "no owner")} · ${esc(m.statusOverride === "hold" ? "on hold" : String(m.value || "no value"))}</small></span>`).join("") : '<p class="empty">Every metric has a rating.</p>';
-    $("rule-note").textContent = `Status rule from the workbook: at or better than target is Green; within ${Math.round(state.bandStd * 100)}% of target is Yellow (${Math.round(state.bandAlt * 100)}% for revenue, erosion, organic growth and account reviews); beyond that is Red. Trend arrows follow the same rule: ↑ on target, → inside the band, ↓ outside it.`;
+    $("rule-note").textContent = `Status rule from the workbook: at or better than target is Green; within ${Math.round(state.bandStd * 100)}% of target is Yellow (${Math.round(state.bandAlt * 100)}% for revenue, erosion, organic growth and account reviews); beyond that is Red. Trend arrows follow the same rule: ↑ on target, → inside the band, ↓ outside it. Section tiles use the section score (Green counts 1, Yellow 0.5): 75 or above is On track, 50 to 74 is Watch, below 50 is Red.`;
   }
 
   // What it takes to reach target, in the metric's own units.
@@ -452,6 +452,12 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     return m.direction === "Higher" ? { short: `+${amt} to target`, long: `Needs +${amt} to reach target` } : { short: `${amt} over target`, long: `${amt} over the target; needs to come down by that much` };
   }
   function severity(e) { return e.attain == null ? 0.5 : e.attain; }
+
+  // Section verdict from its score, so one off-target metric doesn't paint a healthy section Red.
+  function sectionStatus(t) {
+    if (t.rated === 0) return { cls: "none", status: "No data" };
+    return t.score >= 75 ? { cls: "good", status: "On track" } : t.score >= 50 ? { cls: "warn", status: "Watch" } : { cls: "bad", status: "Red" };
+  }
 
   function renderBrief(all) {
     const items = [];
