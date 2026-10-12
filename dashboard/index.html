@@ -946,8 +946,6 @@ details.area-detail .metrics { padding: 0 18px 8px; }
       const t = tally(s.metrics), v = sectionStatus(t);
       const items = s.metrics.map((m) => ({ s, m, e: evaluate(m), dir: direction(m, historyFor(m)) }));
       const flagged = items.filter((x) => x.e.cls === "bad" || x.e.cls === "warn").sort((a, b) => (a.e.cls === b.e.cls ? severity(a.e) - severity(b.e) : a.e.cls === "bad" ? -1 : 1));
-      const good = items.filter((x) => x.e.cls === "good").sort((a, b) => (b.e.attain ?? 1) - (a.e.attain ?? 1));
-      const improving = items.filter((x) => x.e.cls !== "good" && x.e.cls !== "none" && x.dir && x.dir.cls === "up");
       const unrated = items.filter((x) => x.e.cls === "none");
       const acts = actions.filter((a) => a.status !== "done" && s.metrics.some((m) => m.id === a.metricId));
       const attnLine = (x) => { const g = gapInfo(x.m, x.e); return [g ? g.short : "", x.m.owner || "Unassigned"].filter(Boolean).join(" · "); };
@@ -964,7 +962,6 @@ details.area-detail .metrics { padding: 0 18px 8px; }
           </div>
           <div class="panel area-lists">
             <div><h4>Needs attention</h4><div class="attn">${flagged.length ? flagged.map((x) => itemHTML(x, attnLine(x))).join("") : '<p class="empty">Nothing Red or Yellow in this area.</p>'}</div></div>
-            <div><h4>Going well</h4><div class="attn">${good.length || improving.length ? good.map((x) => itemHTML(x, `${winLine({ ...x, kind: "ahead" })} · ${x.m.owner || "Unassigned"}`)).join("") + improving.map((x) => itemHTML({ m: x.m, e: { cls: "good", status: "Improving" } }, `${winLine({ ...x, kind: "improving" })} · ${x.m.owner || "Unassigned"}`)).join("") : '<p class="empty">Nothing on target yet in this area.</p>'}</div></div>
             ${acts.length ? `<div><h4>Open actions</h4><div class="mini-acts">${acts.map((a) => `<span class="${isLate(a) ? "late" : ""}">${esc(a.text)} · ${esc(a.owner || "No owner")} · ${esc(dueHTML(a))}</span>`).join("")}</div></div>` : ""}
           </div>
         </div>
@@ -1031,8 +1028,6 @@ details.area-detail .metrics { padding: 0 18px 8px; }
       const g = gapInfo(m, e);
       pts.push({ k: "Biggest gap", t: `${shortName(m.metric)}: ${show(m.value, m.format) || m.value} against ${shortTarget(m)}${g ? ". " + g.long + "." : "."} Owner: ${m.owner || "unassigned"}.` });
     });
-    const w = wins().filter((x) => x.kind === "ahead" && x.e.attain != null && x.e.attain > 1.05);
-    if (w.length) pts.push({ k: "Going well", t: `${w.slice(0, 2).map((x) => `${shortName(x.m.metric)} (${winLine(x).toLowerCase()}, ${x.m.owner || "unassigned"})`).join("; ")}.` });
     const byOwner = {};
     items.forEach(({ m, e }) => { const o = m.owner || "Unassigned"; byOwner[o] ||= { bad: 0, warn: 0 }; if (e.cls === "bad") byOwner[o].bad++; if (e.cls === "warn") byOwner[o].warn++; });
     const top = Object.entries(byOwner).sort((a, b) => b[1].bad - a[1].bad || b[1].warn - a[1].warn)[0];
