@@ -16,6 +16,9 @@ A one-page health dashboard built from the **CEO Cockpit** tab of `v4_Crepes_Goa
 - Every metric has an "as of" date. Editing a value stamps today; numbers older than the stale threshold (default 45 days) are flagged.
 - Actions (metric, owner, due date, done) are stored in `actions/<id>` and shared with everyone who can open the page.
 
+- Past readings (Update data tab) backfill history per metric (`readings/<metric>_<date>`), so trend lines can appear before months of saves. The company health score trend uses each metric's latest reading on each date and skips dates where fewer than half the rated metrics have one.
+- "What's going well" lists Green metrics by margin over target and any non-Green metric that improved since its last reading.
+
 ## Updating
 - Edit numbers in the sheet tab and press **Save for everyone** (published artifact), or
 - **Import updated .xlsx**: reads the CEO Cockpit tab of the workbook, or

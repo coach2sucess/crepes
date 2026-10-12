@@ -79,7 +79,7 @@ button, select, input { font: inherit; color: inherit; }
 /* summary */
 .summary { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; }
 @media (max-width: 860px) { .summary { grid-template-columns: 1fr; } }
-.health { display: grid; gap: 16px; align-content: start; }
+.health { display: grid; gap: 16px; align-content: start; align-self: start; }
 .health-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .dial { width: 132px; max-width: 100%; flex: none; }
 .dial text { fill: var(--ink); }
@@ -145,6 +145,14 @@ button, select, input { font: inherit; color: inherit; }
 @media (max-width: 860px) { .action-form { grid-template-columns: 1fr 1fr; } .action-form .grow { grid-column: 1 / -1; } }
 .action-form .field select, .action-form .field input { width: 100%; min-width: 0; }
 .alist { display: grid; }
+.htrend { display: grid; gap: 4px; }
+.htrend .k { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.htrend svg { width: 100%; height: 86px; display: block; overflow: visible; }
+.htrend svg text { fill: var(--ink-3); font-family: var(--f-mono); font-size: 10px; }
+.htrend p { margin: 0; font-size: 13px; color: var(--ink-3); }
+.rtable { border-collapse: collapse; font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.rtable td { padding: 2px 14px 2px 0; }
+.rtable td.src { font-family: var(--f-body); color: var(--ink-3); }
 .aitem { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--rule); }
 .aitem input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
 .aitem .txt { font-weight: 500; overflow-wrap: anywhere; }
@@ -257,11 +265,18 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
         </div>
         <div class="stack" id="overall-stack" aria-hidden="true"></div>
         <div class="legend" id="overall-legend"></div>
+        <div class="htrend" id="health-trend"></div>
         <div class="sections" id="section-tiles"></div>
       </div>
-      <div class="panel">
-        <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
-        <div class="attn" id="attention"></div>
+      <div style="display:grid;gap:20px;align-content:start;min-width:0">
+        <div class="panel">
+          <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
+          <div class="attn" id="attention"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>What's going well</h2><span>Furthest ahead of target, plus anything improving</span></div>
+          <div class="attn" id="going-well"></div>
+        </div>
       </div>
     </section>
     <section class="panel" id="actions-panel">
@@ -314,6 +329,18 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
         <span id="io-msg" style="font-size:13px;color:var(--ink-3)"></span>
       </div>
     </section>
+    <section class="panel edit-intro" id="readings-panel">
+      <div class="panel-h" style="margin:0"><h2>Past readings</h2><span>Fill in history so trend lines appear now</span></div>
+      <p>Enter earlier values for a metric, for example last month's or last quarter's figure. Each save also records a reading automatically, so you only need this to fill in the past.</p>
+      <form id="reading-form" class="action-form" autocomplete="off" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto">
+        <label class="field" for="rd-metric">Metric<select id="rd-metric"></select></label>
+        <label class="field" for="rd-date">Date the figure applies to<input id="rd-date" type="date" required></label>
+        <label class="field" for="rd-value">Value<input id="rd-value" class="num" required placeholder="e.g. 7,100,000 or 48%"></label>
+        <button class="btn primary" type="submit" id="rd-add">Add reading</button>
+      </form>
+      <div id="rd-list"></div>
+      <span id="rd-note" style="font-size:13px;color:var(--ink-3)"></span>
+    </section>
     <div class="tablewrap">
       <table class="sheet" id="sheet">
         <thead><tr>
@@ -347,7 +374,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
   let actions = [];         // [{id, metricId, metricName, text, owner, due, status, createdAt, doneAt}]
   let showDone = false;
   const openHow = new Set();
-  const HIST_KEY = "crepes-cockpit-history", ACT_KEY = "crepes-cockpit-actions";
+  const HIST_KEY = "crepes-cockpit-history", ACT_KEY = "crepes-cockpit-actions", RD_KEY = "crepes-cockpit-readings";
+  let readings = [];        // entered past values: [{id, metricId, date, v, addedAt}]
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -409,10 +437,11 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
   // One point per date: the metric's own as-of date when recorded, else the save date. Later saves win.
   function historyFor(m) {
     const byDate = new Map();
-    const add = (date, v, at) => { if (v == null || !isFinite(v) || !date) return; const p = byDate.get(date); if (!p || p.at <= at) byDate.set(date, { date, v, at }); };
-    snapshots.forEach((s) => { const rec = s.metrics && s.metrics[m.id]; if (rec) add(rec.asOf || s.date, rec.v, s.savedAt || s.date); });
+    const add = (date, v, at, src) => { if (v == null || !isFinite(v) || !date) return; const p = byDate.get(date); if (!p || p.at <= at) byDate.set(date, { date, v, at, src }); };
+    readings.forEach((r) => { if (r.metricId === m.id) add(r.date, r.v, r.addedAt || "", "Entered as a past reading"); });
+    snapshots.forEach((s) => { const rec = s.metrics && s.metrics[m.id]; if (rec) add(rec.asOf || s.date, rec.v, s.savedAt || s.date, `Saved ${shortDate(s.date)}`); });
     const v = parseNum(m.value);
-    if (isFinite(v)) add(m.asOf || today(), v, "~current"); // the sheet as it stands, including unsaved edits
+    if (isFinite(v)) add(m.asOf || today(), v, "~current", "Current sheet"); // the sheet as it stands, including unsaved edits
     return [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
   }
   function direction(m, pts) {
@@ -444,6 +473,101 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
       <circle cx="${X(last.date).toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="3.5" fill="var(--ink)" stroke="var(--panel)" stroke-width="2"/>
     </svg><span class="dir ${dir.cls}">${dir.label}</span><span>${pts.length} readings since ${shortDate(pts[0].date)}</span>`;
   }
+
+  /* ---------- company health over time ---------- */
+  // Score on a date from each metric's latest reading on or before it. Dates where under half
+  // of today's rated metrics have a reading are skipped, so a few backfilled numbers can't pose as company health.
+  function healthSeries() {
+    const all = state.sections.flatMap((s) => s.metrics);
+    const hist = new Map(all.map((m) => [m.id, historyFor(m)]));
+    const ratedNow = all.filter((m) => evaluate(m).cls !== "none" && isFinite(parseNum(m.value)));
+    const dates = [...new Set([...hist.values()].flat().map((p) => p.date))].filter((d) => d <= today()).sort();
+    const byDate = new Map();
+    dates.forEach((d) => {
+      let known = 0;
+      const ms = all.map((m) => {
+        const pts = hist.get(m.id).filter((p) => p.date <= d);
+        if (!pts.length) return isFinite(parseNum(m.value)) ? null : m; // non-numeric metrics keep their hand-set status
+        if (ratedNow.includes(m)) known++;
+        return { ...m, value: pts[pts.length - 1].v };
+      }).filter(Boolean);
+      if (ratedNow.length && known / ratedNow.length >= 0.5) { const sc = tally(ms).score; if (sc != null) byDate.set(d, { date: d, v: sc }); }
+    });
+    const cur = tally(all).score;
+    if (cur != null) byDate.set(today(), { date: today(), v: cur });
+    return byDate;
+  }
+  function renderHealthTrend() {
+    const byDate = healthSeries();
+    const cur = tally(state.sections.flatMap((s) => s.metrics)).score;
+    const pts = [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+    const el = $("health-trend");
+    if (pts.length < 2) {
+      el.innerHTML = `<span class="k">Health score over time</span><p>One reading so far (${cur ?? "–"} on ${shortDate(today())}). The line starts with the next save on a later day, or once past readings cover at least half the rated metrics for an earlier date.</p>`;
+      return;
+    }
+    // Scores are judged against today's targets so the line shows performance moving, not goalposts.
+    const W = 320, H = 86, L = 22, R = 8, T = 6, B = 16;
+    const x0 = dayNum(pts[0].date), x1 = Math.max(x0 + 1, dayNum(pts[pts.length - 1].date));
+    const X = (iso) => L + ((dayNum(iso) - x0) / (x1 - x0)) * (W - L - R);
+    const Y = (v) => T + (1 - v / 100) * (H - T - B);
+    const line = pts.map((p) => `${X(p.date).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
+    const area = `${X(pts[0].date).toFixed(1)},${Y(0)} ${line} ${X(pts[pts.length - 1].date).toFixed(1)},${Y(0)}`;
+    const last = pts[pts.length - 1], first = pts[0], d = last.v - pts[pts.length - 2].v;
+    const tip = pts.map((p) => `${shortDate(p.date)}: ${p.v}`).join("\n");
+    el.innerHTML = `<span class="k">Health score over time</span>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc("Health score by date: " + tip.replace(/\n/g, "; "))}"><title>${esc(tip)}</title>
+        ${[50, 75].map((g) => `<line x1="${L}" x2="${W - R}" y1="${Y(g)}" y2="${Y(g)}" stroke="var(--rule)" stroke-dasharray="3 3"/><text x="${L - 4}" y="${Y(g) + 3}" text-anchor="end">${g}</text>`).join("")}
+        <line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--rule)"/>
+        <polygon points="${area}" fill="var(--accent-soft)"/>
+        <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        ${pts.map((p) => `<circle cx="${X(p.date).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="${p === last ? 4 : 2.5}" fill="${p === last ? "var(--accent)" : "var(--panel)"}" stroke="var(--accent)" stroke-width="1.5"/>`).join("")}
+        <text x="${L}" y="${H - 3}">${esc(shortDate(first.date))}</text><text x="${W - R}" y="${H - 3}" text-anchor="end">${esc(shortDate(last.date))}</text>
+      </svg>
+      <p>${pts.length} readings. ${d === 0 ? "Unchanged" : d > 0 ? `Up ${d}` : `Down ${-d}`} since ${shortDate(pts[pts.length - 2].date)}. Every point is scored against today's targets, using each metric's latest reading on that date.</p>`;
+  }
+
+  /* ---------- past readings ---------- */
+  function renderReadings() {
+    const sel = $("rd-metric"), cur = sel.value;
+    sel.innerHTML = state.sections.map((s) => `<optgroup label="${esc(s.name)}">${s.metrics.map((m) => `<option value="${esc(m.id)}">${esc(shortName(m.metric))}</option>`).join("")}</optgroup>`).join("");
+    if (cur && findMetric(cur)) sel.value = cur;
+    const m = findMetric(sel.value);
+    const mine = readings.filter((r) => m && r.metricId === m.id).sort((a, b) => (a.date < b.date ? -1 : 1));
+    $("rd-list").innerHTML = !m ? "" : mine.length
+      ? `<table class="rtable"><tbody>${mine.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(fmt(r.v, m.format))}</td><td><button type="button" class="icon-btn" data-rd-rm="${esc(r.id)}" aria-label="Delete reading for ${esc(r.date)}">✕</button></td></tr>`).join("")}</tbody></table>`
+      : `<p class="empty">No past readings entered for ${esc(shortName(m.metric))}.</p>`;
+  }
+  async function writeReading(id, body) {
+    if (db) { const ref = db.collection("readings").doc(id); if (body === null) await ref.delete(); else await ref.set(body); return; }
+    readings = readings.filter((r) => r.id !== id);
+    if (body) readings.push({ id, ...body });
+    store.set(RD_KEY, JSON.stringify(readings));
+    renderReadings(); renderCockpit();
+  }
+  $("rd-metric").addEventListener("change", renderReadings);
+  $("reading-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const m = findMetric($("rd-metric").value), date = $("rd-date").value, raw = $("rd-value").value.trim();
+    const km = raw.match(/^\s*\$?\s*([\d.,]+)\s*([kKmM])\s*$/);
+    let v = km ? parseFloat(km[1].replace(/,/g, "")) * (/k/i.test(km[2]) ? 1e3 : 1e6) : parseNum(raw);
+    if (!m || !date) return;
+    if (!isFinite(v)) { $("rd-note").textContent = "Enter a number, like 7100000, $7.1M or 48%."; return; }
+    if (m.format === "pct" && !raw.includes("%") && Math.abs(v) > 1.5) v = v / 100;
+    if (date > today()) { $("rd-note").textContent = "That date is in the future. Past readings need a date on or before today."; return; }
+    $("rd-add").disabled = true;
+    try {
+      await writeReading(`${m.id}_${date}`, { metricId: m.id, date, v, addedAt: new Date().toISOString() });
+      $("rd-value").value = ""; $("rd-note").textContent = `Added ${fmt(v, m.format)} for ${shortDate(date)} ${date.slice(0, 4)}.`;
+    } catch (err) {
+      $("rd-note").textContent = err && err.code === "invalid_argument" ? "Your access level can't add readings. Ask the cockpit's owner for Contributor access." : "That reading didn't save. Check your connection and try again.";
+    }
+    $("rd-add").disabled = false;
+  });
+  $("rd-list").addEventListener("click", async (ev) => {
+    const b = ev.target.closest("[data-rd-rm]"); if (!b) return;
+    try { await writeReading(b.dataset.rdRm, null); } catch { $("rd-note").textContent = "That reading couldn't be deleted. Try again."; }
+  });
 
   /* ---------- actions ---------- */
   const isLate = (a) => a.status !== "done" && a.due && a.due < today();
@@ -601,6 +725,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     const flagged = [];
     state.sections.forEach((s) => s.metrics.forEach((m) => { const e = evaluate(m); if (e.cls === "bad" || e.cls === "warn") flagged.push({ s, m, e }); }));
     flagged.sort((a, b) => (a.e.cls === b.e.cls ? 0 : a.e.cls === "bad" ? -1 : 1));
+    renderGoingWell();
     $("attention").innerHTML = flagged.length ? flagged.map(({ s, m, e }) => `
       <button class="attn-item" data-jump="m-${esc(m.id)}">
         ${chip(e)}
@@ -618,6 +743,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     }).join("");
     renderBrief(all);
     renderActions();
+    renderHealthTrend();
     renderLeaders();
     const blind = [];
     state.sections.forEach((s) => s.metrics.forEach((m) => { if (evaluate(m).cls === "none") blind.push(m); }));
@@ -642,6 +768,34 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     return t.score >= 75 ? { cls: "good", status: "On track" } : t.score >= 50 ? { cls: "warn", status: "Watch" } : { cls: "bad", status: "Red" };
   }
 
+  // Wins: Green metrics ranked by how far past target they are, then non-Green metrics whose latest reading improved.
+  function wins() {
+    const out = [];
+    state.sections.forEach((s) => s.metrics.forEach((m) => {
+      const e = evaluate(m), dir = direction(m, historyFor(m));
+      if (e.cls === "good") out.push({ s, m, e, dir, kind: "ahead" });
+      else if (dir && dir.cls === "up" && e.cls !== "none") out.push({ s, m, e, dir, kind: "improving" });
+    }));
+    const ahead = (x) => (x.e.attain == null ? 1 : x.e.attain);
+    return out.sort((a, b) => (a.kind === b.kind ? ahead(b) - ahead(a) : a.kind === "ahead" ? -1 : 1));
+  }
+  function winLine({ m, e, dir, kind }) {
+    if (kind === "improving") return `${dir.label.replace(/^\S+\s/, "")} since the last reading, still ${e.status}`;
+    if (e.attain == null || !isFinite(e.v) || !isFinite(e.t) || e.t === 0) return "On target";
+    const pct = Math.round(Math.abs((e.v - e.t) / e.t) * 100);
+    const cue = pct === 0 ? "Right on target" : m.direction === "Lower" ? `${pct}% under the ceiling` : `${pct}% ahead of target`;
+    return dir && dir.cls === "up" ? `${cue}, and improving` : cue;
+  }
+  function renderGoingWell() {
+    const w = wins();
+    $("going-well").innerHTML = w.length ? w.map((x) => `
+      <button class="attn-item" data-jump="m-${esc(x.m.id)}">
+        ${chip(x.kind === "improving" ? { cls: "good", status: "Improving" } : x.e)}
+        <span style="min-width:0"><span class="m">${esc(shortName(x.m.metric))}</span><br><span class="o">${esc(winLine(x))} · ${esc(x.m.owner || "Unassigned")}</span></span>
+        <span class="v num">${esc(show(x.m.value, x.m.format) || "–")}<small>target ${esc(shortTarget(x.m))}</small></span>
+      </button>`).join("") : `<p class="empty">Nothing is on target yet. Look for any metric that improved since the last reading.</p>`;
+  }
+
   function renderBrief(all) {
     const items = [];
     state.sections.forEach((s) => s.metrics.forEach((m) => items.push({ s, m, e: evaluate(m) })));
@@ -660,6 +814,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
       const g = gapInfo(m, e);
       pts.push({ k: "Biggest gap", t: `${shortName(m.metric)}: ${show(m.value, m.format) || m.value} against ${shortTarget(m)}${g ? ". " + g.long + "." : "."} Owner: ${m.owner || "unassigned"}.` });
     });
+    const w = wins().filter((x) => x.kind === "ahead" && x.e.attain != null && x.e.attain > 1.05);
+    if (w.length) pts.push({ k: "Going well", t: `${w.slice(0, 2).map((x) => `${shortName(x.m.metric)} (${winLine(x).toLowerCase()}, ${x.m.owner || "unassigned"})`).join("; ")}.` });
     const byOwner = {};
     items.forEach(({ m, e }) => { const o = m.owner || "Unassigned"; byOwner[o] ||= { bad: 0, warn: 0 }; if (e.cls === "bad") byOwner[o].bad++; if (e.cls === "warn") byOwner[o].warn++; });
     const top = Object.entries(byOwner).sort((a, b) => b[1].bad - a[1].bad || b[1].warn - a[1].warn)[0];
@@ -688,6 +844,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
       const lateMine = actions.filter((a) => isLate(a) && (a.owner || "Unassigned") === name).length;
       const talk = lateMine ? `Ask about ${lateMine} overdue ${lateMine === 1 ? "action" : "actions"} first. ` + (worst ? `Then ${shortName(worst.m.metric)}.` : "") : worst ? `Start with ${shortName(worst.m.metric)}.${unmeasured ? ` Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : ""}`
         : unmeasured ? `Nothing off target. Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : "Everything on target. Recognize it.";
+      const best = list.filter((x) => x.e.cls === "good").sort((a, b) => (b.e.attain ?? 1) - (a.e.attain ?? 1))[0];
+      const credit = best && worst ? `Recognize first: ${shortName(best.m.metric)} is ${winLine({ ...best, dir: direction(best.m, historyFor(best.m)), kind: "ahead" }).toLowerCase()}. ` : "";
       return `<section class="panel leader">
         <div class="panel-h" style="margin-bottom:8px"><h3>${esc(name)}</h3><span class="num">${t.score ?? "–"}</span></div>
         <div class="sub">${esc(secs)} · ${t.bad} red · ${t.warn} yellow · ${t.good} green${t.none ? ` · ${t.none} unrated` : ""}</div>
@@ -697,7 +855,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
           return `<li>${chip(e)}<span class="m">${esc(shortName(m.metric))}</span><span class="d">${esc(show(m.value, m.format) || "–")} vs ${esc(shortTarget(m))}${g ? " · " + esc(g.short) : ""}</span></li>`;
         }).join("")}</ul>
         ${(() => { const mine = actions.filter((a) => a.status !== "done" && (a.owner || "Unassigned") === name); return mine.length ? `<div class="acts"><b>Open actions</b>${mine.map((a) => `<span class="${isLate(a) ? "late" : ""}">${esc(a.text)} · ${esc(dueHTML(a))}</span>`).join("")}</div>` : ""; })()}
-        <div class="talk">${esc(talk)}</div>
+        <div class="talk">${esc(credit + talk)}</div>
       </section>`;
     }).join("");
   }
@@ -744,7 +902,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     return `<div><dt>Status rule</dt><dd>${rule}</dd></div>
       <div><dt>Exact figures</dt><dd class="thr">Current: ${esc(raw(m.value))}<br>Target: ${esc(raw(m.target))}${isFinite(e.v) && isFinite(e.t) && m.auto !== false ? `<br>Difference: ${esc((e.v - e.t >= 0 ? "+" : "−") + Math.abs(e.v - e.t).toLocaleString("en-US", { maximumFractionDigits: 4 }))}` : ""}</dd></div>
       <div><dt>Definition and source</dt><dd>${esc([subName(m.metric), m.note].filter(Boolean).join(" · ") || "No definition recorded in the sheet.")}</dd></div>
-      <div><dt>Accountable</dt><dd>${esc(m.owner || "Unassigned")}</dd></div>`;
+      <div><dt>Accountable</dt><dd>${esc(m.owner || "Unassigned")}</dd></div>
+      <div style="grid-column:1/-1"><dt>Readings behind the trend</dt><dd>${(() => { const pts = historyFor(m); return pts.length ? `<table class="rtable"><tbody>${pts.map((p) => `<tr><td>${esc(shortDate(p.date))} ${esc(p.date.slice(0, 4))}</td><td>${esc(fmt(p.v, m.format))}</td><td class="src">${esc(p.src || "")}</td></tr>`).join("")}</tbody></table>` : "No numeric readings yet."; })()}</dd></div>`;
   }
 
   // Attainment bar: 0–150% of target on one scale; tick at 100%, faint band where Yellow starts.
@@ -773,6 +932,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     $("band-alt").value = Math.round(state.bandAlt * 100);
     $("asof-input").value = state.asOf || "";
     $("stale-days").value = state.staleDays || 45;
+    renderReadings();
     $("sheet-body").innerHTML = state.sections.map((s, si) => `
       <tr class="sec-row"><td colspan="12">Section ${si + 1}: ${esc(s.name)}<span>${esc(s.question)}</span></td></tr>
       ${s.metrics.map((m, mi) => {
@@ -963,11 +1123,14 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
     if (!db) {
       try { snapshots = JSON.parse(store.get(HIST_KEY) || "[]"); } catch { snapshots = []; }
       try { actions = JSON.parse(store.get(ACT_KEY) || "[]"); } catch { actions = []; }
+      try { readings = JSON.parse(store.get(RD_KEY) || "[]"); } catch { readings = []; }
+      renderReadings();
       $("actions-note").textContent = "Actions and history are kept in this browser only. Open the published cockpit to share them.";
       renderCockpit();
       return;
     }
     db.collection("snapshots").limit(1000).onSnapshot((qs) => { snapshots = qs.docs.map((d) => d.data()); renderCockpit(); }, () => {});
+    db.collection("readings").limit(1000).onSnapshot((qs) => { readings = qs.docs.map((d) => ({ id: d.id, ...d.data() })); renderReadings(); renderCockpit(); }, () => {});
     db.collection("actions").limit(1000).onSnapshot((qs) => { actions = qs.docs.map((d) => ({ id: d.id, ...d.data() })); renderCockpit(); }, () => { $("actions-note").textContent = "Actions couldn't load. Reload the page to try again."; });
   }
 
