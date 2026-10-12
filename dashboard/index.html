@@ -199,6 +199,49 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
 .icon-btn:hover { color: var(--bad); background: var(--bad-bg); }
 .add-btn { border: 0; background: transparent; color: var(--accent); cursor: pointer; font-weight: 600; padding: 6px 8px; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 14px; max-width: calc(100% - 32px); z-index: 10; }
+/* status wall */
+.wall { display: grid; gap: 14px; }
+.wall-sec { display: grid; gap: 6px; }
+.wall-sec h3 { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-family: var(--f-body); display: flex; justify-content: space-between; gap: 8px; }
+.wall-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 128px), 1fr)); gap: 6px; }
+.wtile { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 6px; align-items: start; text-align: left; border: 1px solid transparent; border-radius: 6px; padding: 7px 8px; cursor: pointer; min-height: 58px; }
+.wtile:hover { border-color: var(--ink-3); }
+.wtile svg { width: 12px; height: 12px; margin-top: 3px; }
+.wtile .n { font-size: 12.5px; line-height: 1.25; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--ink); }
+.wtile .v { grid-column: 2; font-family: var(--f-mono); font-size: 13px; font-weight: 600; color: var(--ink); }
+.wtile.good { background: var(--good-bg); color: var(--good); }
+.wtile.warn { background: var(--warn-bg); color: var(--warn); }
+.wtile.bad { background: var(--bad-bg); color: var(--bad); }
+.wtile.none { background: transparent; border: 1px dashed var(--rule); color: var(--none); }
+.wtile.none .v { color: var(--ink-3); font-weight: 500; }
+/* distance from target */
+.dist { display: grid; gap: 2px; }
+.drow { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 7.5rem; gap: 12px; align-items: center; padding: 3px 4px; border-radius: 4px; cursor: pointer; text-align: left; border: 0; background: none; width: 100%; }
+.drow:hover { background: var(--panel-2); }
+.drow .l { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drow .l small { color: var(--ink-3); margin-left: 4px; }
+.dtrack { position: relative; height: 18px; }
+.dtrack::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); z-index: 1; }
+.dtrack .grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+.dbar { position: absolute; top: 3px; height: 12px; }
+.dbar.pos { left: 50%; border-radius: 0 4px 4px 0; }
+.dbar.neg { right: 50%; border-radius: 4px 0 0 4px; }
+.dbar.clip.pos { border-radius: 0; clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%); }
+.dbar.clip.neg { border-radius: 0; clip-path: polygon(6px 0, 100% 0, 100% 100%, 6px 100%, 0 50%); }
+.drow .p { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; text-align: right; white-space: nowrap; }
+.dscale { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 7.5rem; gap: 12px; padding: 0 4px 6px; }
+.dscale div { position: relative; height: 14px; font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.dscale div span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.dscale .dhead { align-self: end; }
+.dhead { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+@media (max-width: 640px) {
+  .drow, .dscale { grid-template-columns: minmax(0, 1fr) 5.5rem; }
+  .drow .l { grid-column: 1 / -1; }
+  .dscale > :first-child { display: none; }
+}
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; align-items: start; }
+.mini-dial { width: 56px; height: 34px; flex: none; }
+.mini-dial text { fill: var(--ink); font-family: var(--f-mono); font-weight: 600; font-size: 15px; }
 /* bottom line */
 .brief { display: grid; gap: 12px; }
 .brief .lead { font-family: var(--f-display); font-weight: 700; font-stretch: 92%; font-size: clamp(19px, 2.4vw, 23px); line-height: 1.25; margin: 0; max-width: 62ch; text-wrap: balance; }
@@ -271,15 +314,23 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
         <div class="htrend" id="health-trend"></div>
         <div class="sections" id="section-tiles"></div>
       </div>
-      <div style="display:grid;gap:20px;align-content:start;min-width:0">
-        <div class="panel">
-          <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
-          <div class="attn" id="attention"></div>
-        </div>
-        <div class="panel">
-          <div class="panel-h"><h2>What's going well</h2><span>Furthest ahead of target, plus anything improving</span></div>
-          <div class="attn" id="going-well"></div>
-        </div>
+      <div class="panel" style="align-self:start">
+        <div class="panel-h"><h2>Every metric at a glance</h2><span>Click a tile for its detail</span></div>
+        <div class="wall" id="wall"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-h"><h2>Distance from target</h2><span>Right of center is ahead of target, left is behind. Bars stop at ±100%.</span></div>
+      <div class="dist" id="dist"></div>
+    </section>
+    <section class="pair">
+      <div class="panel">
+        <div class="panel-h"><h2>Needs leadership attention</h2><span>Red first, then Yellow</span></div>
+        <div class="attn" id="attention"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h2>What's going well</h2><span>Furthest ahead of target, plus anything improving</span></div>
+        <div class="attn" id="going-well"></div>
       </div>
     </section>
     <section class="panel" id="actions-panel">
@@ -748,10 +799,10 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
       const t = tally(s.metrics);
       const e = sectionStatus(t);
       return `<button class="sec-tile" data-jump="sec-${esc(s.key)}">
-        <div class="row"><span class="t">${esc(s.name)}</span>${chip(e)}</div>
+        <div class="row"><span class="t">${esc(s.name)}</span>${miniDial(t.score)}</div>
+        <div class="row">${chip(e)}</div>
         <div class="stack">${stackHTML(t)}</div>
-        <div class="row"><span class="q">${esc(s.question)}</span></div>
-        <div class="row" style="font-size:12.5px;color:var(--ink-2)"><span>${t.bad} red · ${t.warn} yellow · ${t.good} green</span><span class="num">${t.score ?? "–"}</span></div>
+        <div class="row" style="font-size:12.5px;color:var(--ink-2)"><span>${t.bad} red · ${t.warn} yellow · ${t.good} green</span></div>
       </button>`;
     }).join("");
 
@@ -776,6 +827,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
       </section>`;
     }).join("");
     renderBrief(all);
+    renderWall();
+    renderDistance();
     renderActions();
     renderHealthTrend();
     renderLeaders();
@@ -829,6 +882,55 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-si
         <span class="v num">${esc(show(x.m.value, x.m.format) || "–")}<small>target ${esc(shortTarget(x.m))}</small></span>
       </button>`).join("") : `<p class="empty">Nothing is on target yet. Look for any metric that improved since the last reading.</p>`;
   }
+
+  function scoreColor(sc) { return sc == null ? "var(--none)" : sc >= 75 ? "var(--good)" : sc >= 50 ? "var(--warn-mark)" : "var(--bad)"; }
+  function miniDial(sc) {
+    const r = 24, cx = 28, cy = 30, v = sc ?? 0, a = Math.PI * (1 - v / 100);
+    const x = cx + r * Math.cos(a), y = cy - r * Math.sin(a);
+    return `<svg class="mini-dial" viewBox="0 0 56 34" role="img" aria-label="Section score ${sc ?? "not available"} of 100">
+      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="var(--track)" stroke-width="6" stroke-linecap="round"/>
+      ${sc ? `<path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${x.toFixed(2)} ${y.toFixed(2)}" fill="none" stroke="${scoreColor(sc)}" stroke-width="6" stroke-linecap="round"/>` : ""}
+      <text x="${cx}" y="${cy - 2}" text-anchor="middle">${sc ?? "–"}</text></svg>`;
+  }
+
+  function renderWall() {
+    $("wall").innerHTML = state.sections.map((s) => {
+      const t = tally(s.metrics);
+      return `<div class="wall-sec"><h3><span>${esc(s.name)}</span><span class="num">${t.score ?? "–"}</span></h3><div class="wall-tiles">${s.metrics.map((m) => {
+        const e = evaluate(m);
+        const v = show(m.value, m.format) || "–";
+        const label = `${shortName(m.metric)}: ${e.status === "hold" ? "On hold" : e.status}, ${v}`;
+        return `<button class="wtile ${e.cls}" data-jump="m-${esc(m.id)}" title="${esc(label + (shortTarget(m) !== "–" ? ` vs target ${shortTarget(m)}` : ""))}" aria-label="${esc(label)}">${ICON[e.cls]}<span class="n">${esc(shortName(m.metric))}</span><span class="v">${esc(v.length > 12 ? (e.status === "hold" ? "On hold" : e.status) : v)}</span></button>`;
+      }).join("")}</div></div>`;
+    }).join("");
+  }
+
+  // Each scored metric as % ahead (+) or behind (−) target, oriented so right is always better.
+  function renderDistance() {
+    const rows = [];
+    state.sections.forEach((s) => s.metrics.forEach((m) => {
+      const e = evaluate(m);
+      if (!e.computed || !isFinite(e.v) || !isFinite(e.t) || e.t === 0) return;
+      const p = (m.direction === "Higher" ? e.v - e.t : e.t - e.v) / Math.abs(e.t);
+      rows.push({ m, e, p });
+    }));
+    rows.sort((a, b) => a.p - b.p);
+    const lim = 1, pos = (p) => 50 + (Math.max(-lim, Math.min(lim, p)) / lim) * 50;
+    const ticks = [-1, -0.5, 0, 0.5, 1];
+    const fill = { good: "var(--good)", warn: "var(--warn-mark)", bad: "var(--bad)" };
+    const grid = ticks.filter((t) => t !== 0).map((t) => `<i class="grid" style="left:${pos(t)}%"></i>`).join("");
+    const scale = `<div class="dscale"><span class="dhead">Behind ← → Ahead</span><div>${ticks.map((t) => `<span style="left:${pos(t)}%">${t > 0 ? "+" : t < 0 ? "−" : ""}${Math.abs(t * 100)}%</span>`).join("")}</div><span></span></div>`;
+    $("dist").innerHTML = rows.length ? scale + rows.map(({ m, e, p }) => {
+      const w = Math.abs(pos(p) - 50), clip = Math.abs(p) > lim;
+      const pct = `${p >= 0 ? "+" : "−"}${Math.abs(p * 100).toFixed(Math.abs(p) < 0.1 ? 1 : 0)}%`;
+      return `<button class="drow" data-jump="m-${esc(m.id)}" title="${esc(`${shortName(m.metric)}: ${show(m.value, m.format)} vs ${shortTarget(m)} (${pct} ${p >= 0 ? "ahead of" : "behind"} target)`)}">
+        <span class="l">${esc(shortName(m.metric))}<small>${esc(m.owner ? m.owner.split(" ")[0] : "")}</small></span>
+        <span class="dtrack">${grid}<i class="dbar ${p >= 0 ? "pos" : "neg"}${clip ? " clip" : ""}" style="width:${Math.max(w, 0.6)}%;background:${fill[e.cls]}"></i></span>
+        <span class="p">${chipIcon(e)} ${esc(pct)}</span>
+      </button>`;
+    }).join("") : `<p class="empty">No metrics can be compared to a numeric target yet.</p>`;
+  }
+  function chipIcon(e) { return `<span style="color:var(--${e.cls === "warn" ? "warn" : e.cls === "good" ? "good" : e.cls === "bad" ? "bad" : "none"});display:inline-flex;vertical-align:-1px">${ICON[e.cls].replace("<svg ", '<svg width="11" height="11" ')}</span>`; }
 
   function renderBrief(all) {
     const items = [];
