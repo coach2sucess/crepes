@@ -21,7 +21,8 @@
      "note": "Through 8/31",
      "format": "usd",
      "auto": true,
-     "id": "r5"
+     "id": "r5",
+     "asOf": "2026-08-31"
     },
     {
      "metric": "Gross Margin %",
@@ -35,7 +36,8 @@
      "note": "Through 8/31",
      "format": "pct",
      "auto": true,
-     "id": "r6"
+     "id": "r6",
+     "asOf": "2026-08-31"
     },
     {
      "metric": "Cash Availability (Minimum Threshold)",
@@ -49,7 +51,8 @@
      "note": "Current",
      "format": "usd",
      "auto": true,
-     "id": "r7"
+     "id": "r7",
+     "asOf": ""
     },
     {
      "metric": "Free Cash Flow (Target: TTM > $0)",
@@ -63,7 +66,8 @@
      "note": "",
      "format": "usd",
      "auto": true,
-     "id": "r8"
+     "id": "r8",
+     "asOf": ""
     },
     {
      "metric": "Month-End Close (Target: ≤8 days)",
@@ -74,10 +78,11 @@
      "trendOverride": "",
      "statusOverride": "",
      "owner": "Jamie Cusick",
-     "note": "9/15/2026",
+     "note": "",
      "format": "days",
      "auto": true,
-     "id": "r9"
+     "id": "r9",
+     "asOf": "2026-09-15"
     }
    ]
   },
@@ -98,7 +103,8 @@
      "note": "",
      "format": "usd",
      "auto": true,
-     "id": "r13"
+     "id": "r13",
+     "asOf": ""
     },
     {
      "metric": "Proposal Win Rate (New)",
@@ -112,7 +118,8 @@
      "note": "",
      "format": "pct",
      "auto": true,
-     "id": "r14"
+     "id": "r14",
+     "asOf": ""
     },
     {
      "metric": "Qualified Leads / Month (Target: 40+)",
@@ -126,7 +133,8 @@
      "note": "",
      "format": "num",
      "auto": true,
-     "id": "r15"
+     "id": "r15",
+     "asOf": ""
     },
     {
      "metric": "Sales Cycle Length (Target: -15% vs Baseline)",
@@ -140,7 +148,8 @@
      "note": "",
      "format": "pct",
      "auto": true,
-     "id": "r16"
+     "id": "r16",
+     "asOf": ""
     },
     {
      "metric": "Net New Revenue (3 buckets: LS $550K | Non-LS $250K | Café Lines $150K)",
@@ -154,7 +163,8 @@
      "note": "",
      "format": "usd",
      "auto": true,
-     "id": "r17"
+     "id": "r17",
+     "asOf": ""
     }
    ]
   },
@@ -175,7 +185,8 @@
      "note": "CORE book · National · parent level · won in 2024, 2025 AND 2026 · full year",
      "format": "usd",
      "auto": true,
-     "id": "r21"
+     "id": "r21",
+     "asOf": ""
     },
     {
      "metric": "Proposal Win Rate (Existing)",
@@ -189,7 +200,8 @@
      "note": "Starts at PROPOSAL · existing logos, parent level · National",
      "format": "pct",
      "auto": true,
-     "id": "r22"
+     "id": "r22",
+     "asOf": ""
     },
     {
      "metric": "Organic Growth (Existing Accounts) (Target: $600K Annual | $150K/Qtr)",
@@ -203,7 +215,8 @@
      "note": "existing business · same client and same show, won in both years",
      "format": "usd",
      "auto": true,
-     "id": "r23"
+     "id": "r23",
+     "asOf": ""
     },
     {
      "metric": "Client Health Score / NPS (Target: Baseline +10%)",
@@ -217,7 +230,8 @@
      "note": "metric not on the board",
      "format": "num",
      "auto": true,
-     "id": "r24"
+     "id": "r24",
+     "asOf": ""
     },
     {
      "metric": "At-Risk Clients Flagged (Target: 0 Unexpected)",
@@ -231,7 +245,8 @@
      "note": "target is zero UNEXPECTED, not zero flagged",
      "format": "num",
      "auto": false,
-     "id": "r25"
+     "id": "r25",
+     "asOf": ""
     },
     {
      "metric": "Bi-Annual Account Reviews Done (Target: 100%)",
@@ -245,7 +260,8 @@
      "note": "ANNUAL cadence · 2026 complete",
      "format": "pct",
      "auto": true,
-     "id": "r26"
+     "id": "r26",
+     "asOf": ""
     },
     {
      "metric": "Avg Deal Value (Target: +10–12%)",
@@ -259,7 +275,8 @@
      "note": "National only · all clients, new and existing",
      "format": "pct",
      "auto": true,
-     "id": "r27"
+     "id": "r27",
+     "asOf": ""
     },
     {
      "metric": "Time to Close, Existing Accounts (Target: ≤90 days)",
@@ -273,7 +290,8 @@
      "note": "Agreed start: SUGGESTED OR ABOVE · shown start: CREATION · National · parent level",
      "format": "days",
      "auto": true,
-     "id": "r28"
+     "id": "r28",
+     "asOf": ""
     }
    ]
   },
@@ -294,7 +312,8 @@
      "note": "per show · read-out flipped to reliability 27 Aug · Smartsheet tracker",
      "format": "pct",
      "auto": true,
-     "id": "r32"
+     "id": "r32",
+     "asOf": ""
     },
     {
      "metric": "Order / Pick Accuracy (Q4 Target)",
@@ -308,7 +327,8 @@
      "note": "pick AND pack errors combined · crate level · from the single WH Error Log",
      "format": "pct",
      "auto": true,
-     "id": "r33"
+     "id": "r33",
+     "asOf": ""
     },
     {
      "metric": "PSM Accuracy at Receipt (Q4 Target: 97%+)",
@@ -322,7 +342,8 @@
      "note": "Asana · Bob's Pick Reviews · by DATE SENT · not-yet-due and pending excluded",
      "format": "pct",
      "auto": true,
-     "id": "r34"
+     "id": "r34",
+     "asOf": ""
     },
     {
      "metric": "CSAT / Client Satisfaction",
@@ -336,7 +357,8 @@
      "note": "per show · no instrument yet",
      "format": "num",
      "auto": true,
-     "id": "r35"
+     "id": "r35",
+     "asOf": ""
     },
     {
      "metric": "Post-Show Report ≤72h",
@@ -350,7 +372,8 @@
      "note": "per show · Smartsheet tracker",
      "format": "pct",
      "auto": true,
-     "id": "r36"
+     "id": "r36",
+     "asOf": ""
     },
     {
      "metric": "Service Document Approval  [new, replaces PSM Document Accuracy]",
@@ -364,7 +387,8 @@
      "note": "documents ON FILE · 128-service catalogue · approval read from Box file names",
      "format": "pct",
      "auto": true,
-     "id": "r37"
+     "id": "r37",
+     "asOf": ""
     }
    ]
   },
@@ -382,10 +406,11 @@
      "trendOverride": "",
      "statusOverride": "hold",
      "owner": "Chris Donovan",
-     "note": "10/1/2026",
+     "note": "",
      "format": "text",
      "auto": true,
-     "id": "r41"
+     "id": "r41",
+     "asOf": "2026-10-01"
     },
     {
      "metric": "SOP Coverage",
@@ -399,7 +424,8 @@
      "note": "",
      "format": "pct",
      "auto": true,
-     "id": "r42"
+     "id": "r42",
+     "asOf": ""
     },
     {
      "metric": "Employee Satisfication Score",
@@ -410,10 +436,11 @@
      "trendOverride": "",
      "statusOverride": "hold",
      "owner": "Chris Donovan",
-     "note": "10/1/2026",
+     "note": "",
      "format": "num",
      "auto": true,
-     "id": "r43"
+     "id": "r43",
+     "asOf": "2026-10-01"
     },
     {
      "metric": "Employee Retention/Voluntary Turnover",
@@ -424,12 +451,14 @@
      "trendOverride": "",
      "statusOverride": "",
      "owner": "Chris Donovan",
-     "note": "10/1/2026",
+     "note": "",
      "format": "pct",
      "auto": true,
-     "id": "r44"
+     "id": "r44",
+     "asOf": "2026-10-01"
     }
    ]
   }
- ]
+ ],
+ "staleDays": 45
 }

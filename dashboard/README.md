@@ -11,6 +11,11 @@ A one-page health dashboard built from the **CEO Cockpit** tab of `v4_Crepes_Goa
 - Standard band 20%; alternate band 50% for Revenue vs Plan, Net New Revenue, Revenue Erosion, Organic Growth and Bi-Annual Reviews. Both are editable.
 - A status picked by hand (for metrics with no number yet) overrides the rule.
 
+## History, freshness and actions
+- Each "Save for everyone" records a dated snapshot (artifact database, `snapshots/<date>`). Trend lines and Improving/Worsening labels come from those snapshots, so they appear once a metric has two readings.
+- Every metric has an "as of" date. Editing a value stamps today; numbers older than the stale threshold (default 45 days) are flagged.
+- Actions (metric, owner, due date, done) are stored in `actions/<id>` and shared with everyone who can open the page.
+
 ## Updating
 - Edit numbers in the sheet tab and press **Save for everyone** (published artifact), or
 - **Import updated .xlsx**: reads the CEO Cockpit tab of the workbook, or

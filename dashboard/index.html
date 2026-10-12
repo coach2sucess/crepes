@@ -124,14 +124,38 @@ button, select, input { font: inherit; color: inherit; }
 /* section detail */
 .sec-block .panel-h h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .metrics { display: grid; gap: 0; }
-.mrow { display: grid; grid-template-columns: 112px minmax(0, 2.2fr) minmax(0, 1.2fr) minmax(0, 1.6fr) 28px; gap: 6px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--rule); }
+.mrow { display: grid; grid-template-columns: 112px minmax(0, 2.2fr) minmax(0, 1.2fr) minmax(0, 1.6fr) 108px; gap: 6px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--rule); }
 .mrow:first-child { border-top: 0; }
 .mrow .name { font-weight: 500; overflow-wrap: anywhere; }
 .mrow .name small { display: block; color: var(--ink-3); font-weight: 400; font-size: 12.5px; margin-top: 2px; }
 .mrow .val { display: grid; gap: 1px; }
 .mrow .val b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; }
 .mrow .val span { color: var(--ink-3); font-size: 12.5px; overflow-wrap: anywhere; }
-.trend { font-size: 18px; text-align: center; color: var(--ink-2); }
+.trend { display: grid; gap: 2px; justify-items: start; font-size: 12px; color: var(--ink-3); min-width: 0; }
+.trend svg { width: 104px; height: 30px; display: block; overflow: visible; }
+.trend .dir { font-weight: 600; white-space: nowrap; }
+.dir.up { color: var(--good); } .dir.down { color: var(--bad); } .dir.flat { color: var(--ink-2); }
+.fresh { font-size: 12px; color: var(--ink-3); }
+.fresh.stale { color: var(--warn); font-weight: 600; }
+.row-links { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.acts-mini { font-size: 12.5px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; font-weight: 500; }
+.acts-mini:hover { text-decoration: underline; }
+/* actions */
+.action-form { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr) minmax(0, 1fr) auto auto; gap: 10px; align-items: end; margin-bottom: 14px; }
+@media (max-width: 860px) { .action-form { grid-template-columns: 1fr 1fr; } .action-form .grow { grid-column: 1 / -1; } }
+.action-form .field select, .action-form .field input { width: 100%; min-width: 0; }
+.alist { display: grid; }
+.aitem { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--rule); }
+.aitem input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); }
+.aitem .txt { font-weight: 500; overflow-wrap: anywhere; }
+.aitem.done .txt { text-decoration: line-through; color: var(--ink-3); }
+.aitem .meta { font-size: 12.5px; color: var(--ink-3); }
+.aitem .meta button { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.aitem .due { font-size: 12.5px; text-align: right; white-space: nowrap; }
+.aitem .due.late { color: var(--bad); font-weight: 600; }
+.aitem .rm { grid-column: 3; justify-self: end; }
+.leader .acts { margin-top: 10px; font-size: 13px; display: grid; gap: 4px; }
+.leader .acts .late { color: var(--bad); font-weight: 600; }
 .bullet { display: grid; gap: 4px; min-width: 0; }
 .bullet svg { width: 100%; height: 18px; display: block; overflow: visible; }
 .bullet .cap { font-size: 12px; color: var(--ink-3); }
@@ -140,7 +164,7 @@ button, select, input { font: inherit; color: inherit; }
   .mrow .val { justify-self: end; text-align: right; min-width: 0; }
   .mrow .name { grid-column: 1 / -1; order: -1; }
   .mrow .bullet { grid-column: 1 / -1; }
-  .mrow .trend { display: none; }
+  .mrow .trend { grid-column: 1 / -1; justify-self: start; text-align: left; }
 }
 
 /* editor */
@@ -151,7 +175,7 @@ button, select, input { font: inherit; color: inherit; }
 .field input, .field select { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; color: var(--ink); }
 .toolrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; }
-table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-size: 13.5px; }
+table.sheet { border-collapse: collapse; width: 100%; min-width: 1400px; font-size: 13.5px; }
 .sheet th { text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); background: var(--panel-2); padding: 8px; border-bottom: 1px solid var(--rule); position: sticky; top: 0; }
 .sheet td { padding: 4px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
 .sheet tr.sec-row td { background: var(--accent-soft); font-family: var(--f-display); font-weight: 700; padding: 8px; }
@@ -240,6 +264,19 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
         <div class="attn" id="attention"></div>
       </div>
     </section>
+    <section class="panel" id="actions-panel">
+      <div class="panel-h"><h2>Actions</h2><span id="actions-sub">Step 4 of the meeting: assign actions</span></div>
+      <form id="action-form" class="action-form" autocomplete="off">
+        <label class="field" for="act-metric">Metric<select id="act-metric"></select></label>
+        <label class="field grow" for="act-text">Action<input id="act-text" required maxlength="300" placeholder="What will be done, specifically"></label>
+        <label class="field" for="act-owner">Owner<input id="act-owner" list="owner-list" maxlength="80"></label>
+        <label class="field" for="act-due">Due<input id="act-due" type="date"></label>
+        <button class="btn primary" type="submit" id="act-add">Add action</button>
+      </form>
+      <datalist id="owner-list"></datalist>
+      <div class="alist" id="actions-list"></div>
+      <div class="toolrow" style="margin-top:10px"><button class="btn quiet" type="button" id="act-show-done" hidden></button><span id="actions-note" style="font-size:13px;color:var(--ink-3)"></span></div>
+    </section>
     <div id="section-blocks" style="display:grid;gap:20px"></div>
     <section class="panel">
       <div class="panel-h"><h2>Blind spots</h2><span>Metrics with no rating yet, and who owns getting one</span></div>
@@ -265,6 +302,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
           <input id="band-std" type="number" min="0" max="100" step="1" class="num"></label>
         <label class="field" for="band-alt">Alternate band (revenue, erosion, organic growth, reviews)
           <input id="band-alt" type="number" min="0" max="100" step="1" class="num"></label>
+        <label class="field" for="stale-days">Flag numbers older than (days)
+          <input id="stale-days" type="number" min="1" max="365" step="1" class="num"></label>
         <label class="field" for="asof-input">Data as of
           <input id="asof-input" type="date"></label>
       </div>
@@ -280,7 +319,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
         <thead><tr>
           <th style="width:23%">Metric</th><th style="width:10%">Current value</th><th style="width:12%">Target</th>
           <th style="width:8%">Format</th><th style="width:7.5%">Direction</th><th style="width:7.5%">Band</th>
-          <th style="width:9.5%">Status</th><th style="width:6%">Result</th><th style="width:9%">Accountable</th><th>Notes</th><th style="width:34px"></th>
+          <th style="width:9.5%">Status</th><th style="width:6%">Result</th><th style="width:9%">As of</th><th style="width:9%">Accountable</th><th>Notes</th><th style="width:34px"></th>
         </tr></thead>
         <tbody id="sheet-body"></tbody>
       </table>
@@ -289,7 +328,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
 </div>
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script type="application/json" id="seed">{"workbook": "v4_Crepes_Goals_Dashboard", "asOf": "2026-10-12", "bandStd": 0.2, "bandAlt": 0.5, "sections": [{"key": "financial", "name": "Financial Health", "question": "Is the company making money and managing cash?", "metrics": [{"metric": "Revenue vs Plan (YTD)", "value": 8542409, "target": 8459120, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "usd", "auto": true, "id": "r5"}, {"metric": "Gross Margin %", "value": 0.526, "target": 0.52, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "pct", "auto": true, "id": "r6"}, {"metric": "Cash Availability (Minimum Threshold)", "value": 2500000, "target": 1000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Current", "format": "usd", "auto": true, "id": "r7"}, {"metric": "Free Cash Flow (Target: TTM > $0)", "value": "TTM<0", "target": 0, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "", "owner": "Jamie Cusick", "note": "", "format": "usd", "auto": true, "id": "r8"}, {"metric": "Month-End Close (Target: ≤8 days)", "value": 10, "target": 8, "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "9/15/2026", "format": "days", "auto": true, "id": "r9"}]}, {"key": "growth", "name": "Growth Engine", "question": "Is future revenue healthy?", "metrics": [{"metric": "Pipeline Coverage Ratio (Net New $2M + Renewal $15M @ 1.5x)", "value": 16303701, "target": 17000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r13"}, {"metric": "Proposal Win Rate (New)", "value": 0.3, "target": 0.3, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r14"}, {"metric": "Qualified Leads / Month (Target: 40+)", "value": 6, "target": 40, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "num", "auto": true, "id": "r15"}, {"metric": "Sales Cycle Length (Target: -15% vs Baseline)", "value": "TBD", "target": -0.15, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "Yellow", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r16"}, {"metric": "Net New Revenue (3 buckets: LS $550K | Non-LS $250K | Café Lines $150K)", "value": 524250, "target": 950000, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r17"}]}, {"key": "client", "name": "Client Health", "question": "Are current clients staying and growing?", "metrics": [{"metric": "Revenue Erosion -- Total Ceiling (Target: ≤$700K Total | ≤$300K Controllable)", "value": "$1,763,754.00", "target": "$700,000 total | $300,000 controllable, on the CORE book", "direction": "Lower", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "CORE book · National · parent level · won in 2024, 2025 AND 2026 · full year", "format": "usd", "auto": true, "id": "r21"}, {"metric": "Proposal Win Rate (Existing)", "value": "66.78%", "target": "80% on the CORE book", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Starts at PROPOSAL · existing logos, parent level · National", "format": "pct", "auto": true, "id": "r22"}, {"metric": "Organic Growth (Existing Accounts) (Target: $600K Annual | $150K/Qtr)", "value": "$895,002.00", "target": "$600,000 annual", "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "existing business · same client and same show, won in both years", "format": "usd", "auto": true, "id": "r23"}, {"metric": "Client Health Score / NPS (Target: Baseline +10%)", "value": "Not measured", "target": "", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "", "note": "metric not on the board", "format": "num", "auto": true, "id": "r24"}, {"metric": "At-Risk Clients Flagged (Target: 0 Unexpected)", "value": "8", "target": "0 unexpected (not comparable to the flagged count)", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "target is zero UNEXPECTED, not zero flagged", "format": "num", "auto": false, "id": "r25"}, {"metric": "Bi-Annual Account Reviews Done (Target: 100%)", "value": 0.5, "target": 1, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "ANNUAL cadence · 2026 complete", "format": "pct", "auto": true, "id": "r26"}, {"metric": "Avg Deal Value (Target: +10–12%)", "value": "11.70%", "target": "+10 to 12%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "National only · all clients, new and existing", "format": "pct", "auto": true, "id": "r27"}, {"metric": "Time to Close, Existing Accounts (Target: ≤90 days)", "value": "150 days", "target": "90 days or fewer", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Agreed start: SUGGESTED OR ABOVE · shown start: CREATION · National · parent level", "format": "days", "auto": true, "id": "r28"}]}, {"key": "ops", "name": "Operational Execution", "question": "Are events delivered reliably?", "metrics": [{"metric": "Service Disruption (Target: ≤5%)", "value": "Not measured", "target": "95% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · read-out flipped to reliability 27 Aug · Smartsheet tracker", "format": "pct", "auto": true, "id": "r32"}, {"metric": "Order / Pick Accuracy (Q4 Target)", "value": "99.59%", "target": "98%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "pick AND pack errors combined · crate level · from the single WH Error Log", "format": "pct", "auto": true, "id": "r33"}, {"metric": "PSM Accuracy at Receipt (Q4 Target: 97%+)", "value": "89.08%", "target": "97% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Troy Heldt", "note": "Asana · Bob's Pick Reviews · by DATE SENT · not-yet-due and pending excluded", "format": "pct", "auto": true, "id": "r34"}, {"metric": "CSAT / Client Satisfaction", "value": "Not measured", "target": "4.5 out of 5", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · no instrument yet", "format": "num", "auto": true, "id": "r35"}, {"metric": "Post-Show Report ≤72h", "value": "Not measured", "target": "100%", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · Smartsheet tracker", "format": "pct", "auto": true, "id": "r36"}, {"metric": "Service Document Approval  [new, replaces PSM Document Accuracy]", "value": "57.00%", "target": "no target set", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "No target", "owner": "Troy Heldt", "note": "documents ON FILE · 128-service catalogue · approval read from Box file names", "format": "pct", "auto": true, "id": "r37"}]}, {"key": "people", "name": "People & Capacity", "question": "Can we deliver at scale?", "metrics": [{"metric": "Enterprise Training / Learning path", "value": "TBD", "target": "See Projects", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "10/1/2026", "format": "text", "auto": true, "id": "r41"}, {"metric": "SOP Coverage", "value": 0.2, "target": 0.5, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "", "format": "pct", "auto": true, "id": "r42"}, {"metric": "Employee Satisfication Score", "value": "TBD", "target": 3.5, "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "10/1/2026", "format": "num", "auto": true, "id": "r43"}, {"metric": "Employee Retention/Voluntary Turnover", "value": 0.95, "target": 0.95, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Donovan", "note": "10/1/2026", "format": "pct", "auto": true, "id": "r44"}]}]}</script>
+<script type="application/json" id="seed">{"workbook": "v4_Crepes_Goals_Dashboard", "asOf": "2026-10-12", "bandStd": 0.2, "bandAlt": 0.5, "sections": [{"key": "financial", "name": "Financial Health", "question": "Is the company making money and managing cash?", "metrics": [{"metric": "Revenue vs Plan (YTD)", "value": 8542409, "target": 8459120, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "usd", "auto": true, "id": "r5", "asOf": "2026-08-31"}, {"metric": "Gross Margin %", "value": 0.526, "target": 0.52, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Through 8/31", "format": "pct", "auto": true, "id": "r6", "asOf": "2026-08-31"}, {"metric": "Cash Availability (Minimum Threshold)", "value": 2500000, "target": 1000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "Current", "format": "usd", "auto": true, "id": "r7", "asOf": ""}, {"metric": "Free Cash Flow (Target: TTM > $0)", "value": "TTM<0", "target": 0, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "", "owner": "Jamie Cusick", "note": "", "format": "usd", "auto": true, "id": "r8", "asOf": ""}, {"metric": "Month-End Close (Target: ≤8 days)", "value": 10, "target": 8, "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Jamie Cusick", "note": "", "format": "days", "auto": true, "id": "r9", "asOf": "2026-09-15"}]}, {"key": "growth", "name": "Growth Engine", "question": "Is future revenue healthy?", "metrics": [{"metric": "Pipeline Coverage Ratio (Net New $2M + Renewal $15M @ 1.5x)", "value": 16303701, "target": 17000000, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r13", "asOf": ""}, {"metric": "Proposal Win Rate (New)", "value": 0.3, "target": 0.3, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r14", "asOf": ""}, {"metric": "Qualified Leads / Month (Target: 40+)", "value": 6, "target": 40, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "num", "auto": true, "id": "r15", "asOf": ""}, {"metric": "Sales Cycle Length (Target: -15% vs Baseline)", "value": "TBD", "target": -0.15, "direction": "", "band": "std", "trendOverride": "→", "statusOverride": "Yellow", "owner": "Chris Metzger", "note": "", "format": "pct", "auto": true, "id": "r16", "asOf": ""}, {"metric": "Net New Revenue (3 buckets: LS $550K | Non-LS $250K | Café Lines $150K)", "value": 524250, "target": 950000, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Chris Metzger", "note": "", "format": "usd", "auto": true, "id": "r17", "asOf": ""}]}, {"key": "client", "name": "Client Health", "question": "Are current clients staying and growing?", "metrics": [{"metric": "Revenue Erosion -- Total Ceiling (Target: ≤$700K Total | ≤$300K Controllable)", "value": "$1,763,754.00", "target": "$700,000 total | $300,000 controllable, on the CORE book", "direction": "Lower", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "CORE book · National · parent level · won in 2024, 2025 AND 2026 · full year", "format": "usd", "auto": true, "id": "r21", "asOf": ""}, {"metric": "Proposal Win Rate (Existing)", "value": "66.78%", "target": "80% on the CORE book", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Starts at PROPOSAL · existing logos, parent level · National", "format": "pct", "auto": true, "id": "r22", "asOf": ""}, {"metric": "Organic Growth (Existing Accounts) (Target: $600K Annual | $150K/Qtr)", "value": "$895,002.00", "target": "$600,000 annual", "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "existing business · same client and same show, won in both years", "format": "usd", "auto": true, "id": "r23", "asOf": ""}, {"metric": "Client Health Score / NPS (Target: Baseline +10%)", "value": "Not measured", "target": "", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "", "note": "metric not on the board", "format": "num", "auto": true, "id": "r24", "asOf": ""}, {"metric": "At-Risk Clients Flagged (Target: 0 Unexpected)", "value": "8", "target": "0 unexpected (not comparable to the flagged count)", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "target is zero UNEXPECTED, not zero flagged", "format": "num", "auto": false, "id": "r25", "asOf": ""}, {"metric": "Bi-Annual Account Reviews Done (Target: 100%)", "value": 0.5, "target": 1, "direction": "Higher", "band": "alt", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "ANNUAL cadence · 2026 complete", "format": "pct", "auto": true, "id": "r26", "asOf": ""}, {"metric": "Avg Deal Value (Target: +10–12%)", "value": "11.70%", "target": "+10 to 12%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "National only · all clients, new and existing", "format": "pct", "auto": true, "id": "r27", "asOf": ""}, {"metric": "Time to Close, Existing Accounts (Target: ≤90 days)", "value": "150 days", "target": "90 days or fewer", "direction": "Lower", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Julie Teplitzky", "note": "Agreed start: SUGGESTED OR ABOVE · shown start: CREATION · National · parent level", "format": "days", "auto": true, "id": "r28", "asOf": ""}]}, {"key": "ops", "name": "Operational Execution", "question": "Are events delivered reliably?", "metrics": [{"metric": "Service Disruption (Target: ≤5%)", "value": "Not measured", "target": "95% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · read-out flipped to reliability 27 Aug · Smartsheet tracker", "format": "pct", "auto": true, "id": "r32", "asOf": ""}, {"metric": "Order / Pick Accuracy (Q4 Target)", "value": "99.59%", "target": "98%", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "pick AND pack errors combined · crate level · from the single WH Error Log", "format": "pct", "auto": true, "id": "r33", "asOf": ""}, {"metric": "PSM Accuracy at Receipt (Q4 Target: 97%+)", "value": "89.08%", "target": "97% or more", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Troy Heldt", "note": "Asana · Bob's Pick Reviews · by DATE SENT · not-yet-due and pending excluded", "format": "pct", "auto": true, "id": "r34", "asOf": ""}, {"metric": "CSAT / Client Satisfaction", "value": "Not measured", "target": "4.5 out of 5", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · no instrument yet", "format": "num", "auto": true, "id": "r35", "asOf": ""}, {"metric": "Post-Show Report ≤72h", "value": "Not measured", "target": "100%", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "Not measured", "owner": "Troy Heldt", "note": "per show · Smartsheet tracker", "format": "pct", "auto": true, "id": "r36", "asOf": ""}, {"metric": "Service Document Approval  [new, replaces PSM Document Accuracy]", "value": "57.00%", "target": "no target set", "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "No target", "owner": "Troy Heldt", "note": "documents ON FILE · 128-service catalogue · approval read from Box file names", "format": "pct", "auto": true, "id": "r37", "asOf": ""}]}, {"key": "people", "name": "People & Capacity", "question": "Can we deliver at scale?", "metrics": [{"metric": "Enterprise Training / Learning path", "value": "TBD", "target": "See Projects", "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "", "format": "text", "auto": true, "id": "r41", "asOf": "2026-10-01"}, {"metric": "SOP Coverage", "value": 0.2, "target": 0.5, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Tom Sittler", "note": "", "format": "pct", "auto": true, "id": "r42", "asOf": ""}, {"metric": "Employee Satisfication Score", "value": "TBD", "target": 3.5, "direction": "", "band": "std", "trendOverride": "", "statusOverride": "hold", "owner": "Chris Donovan", "note": "", "format": "num", "auto": true, "id": "r43", "asOf": "2026-10-01"}, {"metric": "Employee Retention/Voluntary Turnover", "value": 0.95, "target": 0.95, "direction": "Higher", "band": "std", "trendOverride": "", "statusOverride": "", "owner": "Chris Donovan", "note": "", "format": "pct", "auto": true, "id": "r44", "asOf": "2026-10-01"}]}], "staleDays": 45}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 (() => {
@@ -303,6 +342,12 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
   let state = null;       // working state
   let artifactApi;        // undefined = not asked yet, null = unavailable
   let readOnly = false;
+  let db = null;            // shared store for snapshots and actions; null = this browser only
+  let snapshots = [];       // [{date, savedAt, metrics: {id: {v, asOf, status}}}]
+  let actions = [];         // [{id, metricId, metricName, text, owner, due, status, createdAt, doneAt}]
+  let showDone = false;
+  const openHow = new Set();
+  const HIST_KEY = "crepes-cockpit-history", ACT_KEY = "crepes-cockpit-actions";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -336,6 +381,143 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
   }
   const show = (raw, f) => { const n = parseNum(raw); return typeof raw === "number" || (isFinite(n) && /^[\s$+\-−\d.,%]+$/.test(String(raw).replace(/days?/i, ""))) ? fmt(n, f) : String(raw ?? ""); };
+
+  /* ---------- dates & freshness ---------- */
+  function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+  const dayMs = 86400000;
+  const dayNum = (iso) => Math.round(new Date(iso + "T12:00:00").getTime() / dayMs);
+  const shortDate = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  function ageDays(m) { return m.asOf ? dayNum(today()) - dayNum(m.asOf) : null; }
+  function isStale(m) { const a = ageDays(m); return a != null && a > (state.staleDays || 45); }
+  function freshHTML(m) {
+    const a = ageDays(m);
+    if (a == null) return `<span class="fresh">No date recorded</span>`;
+    const label = `As of ${shortDate(m.asOf)} · ${a <= 0 ? "today" : a + (a === 1 ? " day" : " days") + " old"}`;
+    return `<span class="fresh${isStale(m) ? " stale" : ""}">${isStale(m) ? "Stale: " : ""}${esc(label)}</span>`;
+  }
+  function findMetric(id) { for (const s of state.sections) for (const m of s.metrics) if (m.id === id) return m; return null; }
+
+  /* ---------- history ---------- */
+  function snapshotOf(st) {
+    const metrics = {};
+    st.sections.forEach((s) => s.metrics.forEach((m) => {
+      const v = parseNum(m.value);
+      metrics[m.id] = { v: isFinite(v) ? v : null, asOf: m.asOf || "", status: evaluate(m).status };
+    }));
+    return { date: today(), savedAt: new Date().toISOString(), metrics };
+  }
+  // One point per date: the metric's own as-of date when recorded, else the save date. Later saves win.
+  function historyFor(m) {
+    const byDate = new Map();
+    const add = (date, v, at) => { if (v == null || !isFinite(v) || !date) return; const p = byDate.get(date); if (!p || p.at <= at) byDate.set(date, { date, v, at }); };
+    snapshots.forEach((s) => { const rec = s.metrics && s.metrics[m.id]; if (rec) add(rec.asOf || s.date, rec.v, s.savedAt || s.date); });
+    const v = parseNum(m.value);
+    if (isFinite(v)) add(m.asOf || today(), v, "~current"); // the sheet as it stands, including unsaved edits
+    return [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+  }
+  function direction(m, pts) {
+    if (pts.length < 2) return null;
+    const a = pts[pts.length - 2].v, b = pts[pts.length - 1].v, d = b - a;
+    if (Math.abs(d) <= Math.abs(a) * 0.005 || d === 0) return { cls: "flat", label: "→ Flat" };
+    if (!m.direction) return { cls: "flat", label: d > 0 ? "↑ Rising" : "↓ Falling" };
+    const better = m.direction === "Higher" ? d > 0 : d < 0;
+    return better ? { cls: "up", label: (d > 0 ? "↑" : "↓") + " Improving" } : { cls: "down", label: (d > 0 ? "↑" : "↓") + " Worsening" };
+  }
+  function sparkHTML(m) {
+    const pts = historyFor(m);
+    if (pts.length < 2) return `<span title="A trend line appears once this metric has been saved on two different dates.">${pts.length ? "1 reading so far" : "No readings"}</span>`;
+    const t = parseNum(m.target), useT = isFinite(t) && m.auto !== false;
+    const vals = pts.map((p) => p.v).concat(useT ? [t] : []);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (hi === lo) { hi += Math.abs(hi) * 0.1 || 1; lo -= Math.abs(lo) * 0.1 || 1; }
+    const W = 104, H = 30, x0 = dayNum(pts[0].date), x1 = dayNum(pts[pts.length - 1].date) || x0 + 1;
+    const X = (iso) => 3 + ((dayNum(iso) - x0) / Math.max(1, x1 - x0)) * (W - 6);
+    const Y = (v) => 3 + (1 - (v - lo) / (hi - lo)) * (H - 6);
+    const line = pts.map((p) => `${X(p.date).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
+    const area = `${X(pts[0].date).toFixed(1)},${H} ${line} ${X(pts[pts.length - 1].date).toFixed(1)},${H}`;
+    const last = pts[pts.length - 1], dir = direction(m, pts);
+    const tip = pts.map((p) => `${shortDate(p.date)}: ${fmt(p.v, m.format)}`).join("\n") + (useT ? `\nTarget: ${fmt(t, m.format)}` : "");
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`${pts.length} readings. ${tip.replace(/\n/g, "; ")}`)}"><title>${esc(tip)}</title>
+      ${useT ? `<line x1="0" x2="${W}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>` : ""}
+      <polygon points="${area}" fill="var(--accent-soft)"/>
+      <polyline points="${line}" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="${X(last.date).toFixed(1)}" cy="${Y(last.v).toFixed(1)}" r="3.5" fill="var(--ink)" stroke="var(--panel)" stroke-width="2"/>
+    </svg><span class="dir ${dir.cls}">${dir.label}</span><span>${pts.length} readings since ${shortDate(pts[0].date)}</span>`;
+  }
+
+  /* ---------- actions ---------- */
+  const isLate = (a) => a.status !== "done" && a.due && a.due < today();
+  function dueHTML(a) {
+    if (a.status === "done") return a.doneAt ? `Done ${shortDate(a.doneAt.slice(0, 10))}` : "Done";
+    if (!a.due) return "No due date";
+    const d = dayNum(a.due) - dayNum(today());
+    return d < 0 ? `Overdue ${-d} ${d === -1 ? "day" : "days"}` : d === 0 ? "Due today" : `Due ${shortDate(a.due)}`;
+  }
+  function renderActions() {
+    const sel = $("act-metric"), cur = sel.value;
+    sel.innerHTML = state.sections.map((s) => `<optgroup label="${esc(s.name)}">${s.metrics.map((m) => `<option value="${esc(m.id)}">${esc(shortName(m.metric))}</option>`).join("")}</optgroup>`).join("");
+    if (cur && findMetric(cur)) sel.value = cur;
+    $("owner-list").innerHTML = [...new Set(state.sections.flatMap((s) => s.metrics.map((m) => m.owner)).filter(Boolean))].map((o) => `<option value="${esc(o)}">`).join("");
+    const open = actions.filter((a) => a.status !== "done").sort((a, b) => (isLate(b) - isLate(a)) || ((a.due || "9999") < (b.due || "9999") ? -1 : 1));
+    const done = actions.filter((a) => a.status === "done").sort((a, b) => ((a.doneAt || "") < (b.doneAt || "") ? 1 : -1));
+    const late = open.filter(isLate).length;
+    $("actions-sub").textContent = open.length ? `${open.length} open${late ? `, ${late} overdue` : ""}` : "Step 4 of the meeting: assign actions";
+    const item = (a) => {
+      const m = findMetric(a.metricId);
+      return `<div class="aitem${a.status === "done" ? " done" : ""}">
+        <input type="checkbox" id="act-done-${esc(a.id)}" data-done="${esc(a.id)}"${a.status === "done" ? " checked" : ""} aria-label="Mark “${esc(a.text)}” done">
+        <div><div class="txt">${esc(a.text)}</div><div class="meta">${esc(a.owner || "No owner")} · ${m ? `<button type="button" data-jump="m-${esc(m.id)}">${esc(shortName(m.metric))}</button>` : esc(a.metricName || "")}</div></div>
+        <div style="display:grid;gap:4px;justify-items:end"><span class="due${isLate(a) ? " late" : ""}">${esc(dueHTML(a))}</span><button type="button" class="icon-btn rm" data-rm="${esc(a.id)}" aria-label="Delete action “${esc(a.text)}”" title="Delete action">✕</button></div>
+      </div>`;
+    };
+    $("actions-list").innerHTML = open.length || (showDone && done.length) ? open.map(item).join("") + (showDone ? done.map(item).join("") : "")
+      : `<p class="empty">No open actions. When a Red or Yellow metric is discussed, record who will do what by when.</p>`;
+    $("act-show-done").hidden = !done.length;
+    $("act-show-done").textContent = showDone ? "Hide completed" : `Show ${done.length} completed`;
+  }
+  async function writeAction(id, body) {
+    if (db) {
+      const ref = db.collection("actions").doc(id);
+      if (body === null) await ref.delete(); else await ref.set(body);
+      return; // the live subscription redraws
+    }
+    actions = actions.filter((a) => a.id !== id);
+    if (body) actions.push({ id, ...body });
+    store.set(ACT_KEY, JSON.stringify(actions));
+    renderActions(); renderCockpit();
+  }
+  function actionError(err) {
+    const code = err && err.code;
+    $("actions-note").textContent = code === "invalid_argument" ? "You can see actions but your access level can't change them. Ask the cockpit's owner for Contributor access."
+      : code === "quota_exceeded" ? "The action log is full. Delete completed actions to make room."
+      : "That change didn't save. Check your connection and try again.";
+  }
+  $("action-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const text = $("act-text").value.trim();
+    if (!text) { $("act-text").focus(); return; }
+    const m = findMetric($("act-metric").value);
+    const id = "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const body = { metricId: m ? m.id : "", metricName: m ? shortName(m.metric) : "", text, owner: $("act-owner").value.trim() || (m && m.owner) || "", due: $("act-due").value || "", status: "open", createdAt: new Date().toISOString(), doneAt: "" };
+    $("act-add").disabled = true;
+    try { await writeAction(id, body); $("act-text").value = ""; $("act-due").value = ""; $("act-owner").value = ""; $("actions-note").textContent = ""; toast("Action added."); }
+    catch (err) { actionError(err); }
+    $("act-add").disabled = false;
+  });
+  $("act-metric").addEventListener("change", () => { const m = findMetric($("act-metric").value); if (m) $("act-owner").value = m.owner || ""; });
+  $("actions-list").addEventListener("change", async (ev) => {
+    const id = ev.target.dataset.done; if (!id) return;
+    const a = actions.find((x) => x.id === id); if (!a) return;
+    const { id: _, ...rest } = a;
+    try { await writeAction(id, { ...rest, status: ev.target.checked ? "done" : "open", doneAt: ev.target.checked ? new Date().toISOString() : "" }); }
+    catch (err) { ev.target.checked = !ev.target.checked; actionError(err); }
+  });
+  $("actions-list").addEventListener("click", async (ev) => {
+    const b = ev.target.closest("[data-rm]"); if (!b) return;
+    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "Delete?"; b.classList.add("btn"); setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "✕"; b.classList.remove("btn"); } }, 3000); return; }
+    try { await writeAction(b.dataset.rm, null); } catch (err) { actionError(err); }
+  });
+  $("act-show-done").addEventListener("click", () => { showDone = !showDone; renderActions(); });
 
   /* ---------- the workbook's status rule ---------- */
   function evaluate(m) {
@@ -435,6 +617,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
       </section>`;
     }).join("");
     renderBrief(all);
+    renderActions();
     renderLeaders();
     const blind = [];
     state.sections.forEach((s) => s.metrics.forEach((m) => { if (evaluate(m).cls === "none") blind.push(m); }));
@@ -481,6 +664,11 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     items.forEach(({ m, e }) => { const o = m.owner || "Unassigned"; byOwner[o] ||= { bad: 0, warn: 0 }; if (e.cls === "bad") byOwner[o].bad++; if (e.cls === "warn") byOwner[o].warn++; });
     const top = Object.entries(byOwner).sort((a, b) => b[1].bad - a[1].bad || b[1].warn - a[1].warn)[0];
     if (top && (top[1].bad || top[1].warn)) pts.push({ k: "First conversation", t: `${top[0]}: ${top[1].bad} red and ${top[1].warn} yellow. See By leader for the full list.` });
+    const stale = items.filter((x) => isStale(x.m) && x.e.cls !== "none");
+    const undated = items.filter((x) => !x.m.asOf && x.e.cls !== "none");
+    if (stale.length || undated.length) pts.push({ k: "Freshness", t: `${stale.length ? `${stale.length} rated ${stale.length === 1 ? "number is" : "numbers are"} older than ${state.staleDays || 45} days (${stale.slice(0, 2).map((x) => shortName(x.m.metric)).join(", ")}${stale.length > 2 ? "…" : ""}). ` : ""}${undated.length ? `${undated.length} rated ${undated.length === 1 ? "number has" : "numbers have"} no date.` : ""}`.trim() });
+    const openA = actions.filter((a) => a.status !== "done"), lateA = openA.filter(isLate);
+    if (openA.length) pts.push({ k: "Follow-through", t: `${openA.length} open ${openA.length === 1 ? "action" : "actions"}${lateA.length ? `, ${lateA.length} overdue (${[...new Set(lateA.map((a) => a.owner || "no owner"))].join(", ")})` : ", none overdue"}.` });
     if (blind.length) pts.push({ k: "Blind spots", t: `${blind.length} of ${items.length} metrics have no rating, including ${blind.slice(0, 3).map((x) => shortName(x.m.metric)).join(", ")}.` });
     $("brief-points").innerHTML = pts.map((p) => `<li><span class="k">${esc(p.k)}</span><span class="t">${esc(p.t)}</span></li>`).join("");
   }
@@ -497,7 +685,8 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
       const secs = [...new Set(list.map((x) => x.s.name))].join(", ");
       const worst = list.find((x) => x.e.cls === "bad") || list.find((x) => x.e.cls === "warn");
       const unmeasured = list.filter((x) => x.e.cls === "none").length;
-      const talk = worst ? `Start with ${shortName(worst.m.metric)}.${unmeasured ? ` Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : ""}`
+      const lateMine = actions.filter((a) => isLate(a) && (a.owner || "Unassigned") === name).length;
+      const talk = lateMine ? `Ask about ${lateMine} overdue ${lateMine === 1 ? "action" : "actions"} first. ` + (worst ? `Then ${shortName(worst.m.metric)}.` : "") : worst ? `Start with ${shortName(worst.m.metric)}.${unmeasured ? ` Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : ""}`
         : unmeasured ? `Nothing off target. Ask for a measurement plan on ${unmeasured} unrated ${unmeasured === 1 ? "metric" : "metrics"}.` : "Everything on target. Recognize it.";
       return `<section class="panel leader">
         <div class="panel-h" style="margin-bottom:8px"><h3>${esc(name)}</h3><span class="num">${t.score ?? "–"}</span></div>
@@ -507,6 +696,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
           const g = gapInfo(m, e);
           return `<li>${chip(e)}<span class="m">${esc(shortName(m.metric))}</span><span class="d">${esc(show(m.value, m.format) || "–")} vs ${esc(shortTarget(m))}${g ? " · " + esc(g.short) : ""}</span></li>`;
         }).join("")}</ul>
+        ${(() => { const mine = actions.filter((a) => a.status !== "done" && (a.owner || "Unassigned") === name); return mine.length ? `<div class="acts"><b>Open actions</b>${mine.map((a) => `<span class="${isLate(a) ? "late" : ""}">${esc(a.text)} · ${esc(dueHTML(a))}</span>`).join("")}</div>` : ""; })()}
         <div class="talk">${esc(talk)}</div>
       </section>`;
     }).join("");
@@ -528,13 +718,14 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
       }
     }
     const gap = e.cls !== "good" ? gapInfo(m, e) : null;
+    const nOpen = actions.filter((a) => a.metricId === m.id && a.status !== "done").length;
     return `<div class="mrow" id="m-${esc(m.id)}">
       <div>${chip(e)}</div>
-      <div class="name">${esc(shortName(m.metric))}${subName(m.metric) ? `<small>${esc(subName(m.metric))}</small>` : ""}<button class="how-btn" data-how="${esc(m.id)}" aria-expanded="false" aria-controls="how-${esc(m.id)}">How it's measured</button></div>
-      <div class="val"><b>${esc(val)}</b><span>Target ${esc(tgt || "not set")}</span></div>
+      <div class="name">${esc(shortName(m.metric))}${subName(m.metric) ? `<small>${esc(subName(m.metric))}</small>` : ""}<span class="row-links"><button class="how-btn" data-how="${esc(m.id)}" aria-expanded="${openHow.has(m.id)}" aria-controls="how-${esc(m.id)}">${openHow.has(m.id) ? "Hide method" : "How it's measured"}</button><button class="how-btn" data-act="${esc(m.id)}">+ Action</button>${nOpen ? `<button class="acts-mini" data-jump="actions-panel">${nOpen} open ${nOpen === 1 ? "action" : "actions"}</button>` : ""}</span></div>
+      <div class="val"><b>${esc(val)}</b><span>Target ${esc(tgt || "not set")}</span>${freshHTML(m)}</div>
       <div class="bullet">${bullet(e, m)}<span class="cap">${esc([delta, m.owner].filter(Boolean).join(" · ") || m.owner || "")}</span>${gap ? `<span class="gap">${esc(gap.long.split(";")[0])}</span>` : ""}</div>
-      <div class="trend" title="Trend">${esc(e.trend)}</div>
-      <dl class="how" id="how-${esc(m.id)}" hidden>${methodHTML(m, e)}</dl>
+      <div class="trend">${sparkHTML(m)}</div>
+      <dl class="how" id="how-${esc(m.id)}"${openHow.has(m.id) ? "" : " hidden"}>${methodHTML(m, e)}</dl>
     </div>`;
   }
 
@@ -581,8 +772,9 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     $("band-std").value = Math.round(state.bandStd * 100);
     $("band-alt").value = Math.round(state.bandAlt * 100);
     $("asof-input").value = state.asOf || "";
+    $("stale-days").value = state.staleDays || 45;
     $("sheet-body").innerHTML = state.sections.map((s, si) => `
-      <tr class="sec-row"><td colspan="11">Section ${si + 1}: ${esc(s.name)}<span>${esc(s.question)}</span></td></tr>
+      <tr class="sec-row"><td colspan="12">Section ${si + 1}: ${esc(s.name)}<span>${esc(s.question)}</span></td></tr>
       ${s.metrics.map((m, mi) => {
         const id = `${si}-${mi}`;
         const statusVal = m.auto === false && !m.statusOverride ? "__off" : m.statusOverride || "";
@@ -595,12 +787,13 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
           <td><select id="band-${id}" data-k="band" aria-label="Tolerance band">${opt("std", "Standard", m.band)}${opt("alt", "Alternate", m.band)}</select></td>
           <td><select id="status-${id}" data-k="status" aria-label="Status">${opt("", "Auto", statusVal)}${MANUAL.map((x) => opt(x, x === "hold" ? "On hold" : x, statusVal)).join("")}${opt("__off", "Pending (don't compare)", statusVal)}</select></td>
           <td class="out" data-out>${chip(evaluate(m))}</td>
+          <td><input id="asof-${id}" data-k="asOf" type="date" value="${esc(m.asOf || "")}" aria-label="Value as of"></td>
           <td><input id="owner-${id}" data-k="owner" value="${esc(m.owner)}" aria-label="Accountable"></td>
           <td><input id="note-${id}" data-k="note" value="${esc(m.note)}" aria-label="Notes"></td>
           <td><button class="icon-btn" data-del title="Remove metric" aria-label="Remove ${esc(shortName(m.metric))}">✕</button></td>
         </tr>`;
       }).join("")}
-      <tr><td colspan="11"><button class="add-btn" data-add="${si}">+ Add metric to ${esc(s.name)}</button></td></tr>`).join("");
+      <tr><td colspan="12"><button class="add-btn" data-add="${si}">+ Add metric to ${esc(s.name)}</button></td></tr>`).join("");
   }
 
   /* ---------- state changes ---------- */
@@ -628,6 +821,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
       const n = parseNum(raw);
       m[k] = raw !== "" && /^[\s$+\-−\d.,]+$/.test(raw) && isFinite(n) ? n : raw;
       if (m.format === "pct" && typeof m[k] === "number" && Math.abs(m[k]) > 1.5) m[k] = m[k] / 100; // "52" in a percent row means 52%
+      if (k === "value") { m.asOf = today(); const di = tr.querySelector('[data-k="asOf"]'); if (di) di.value = m.asOf; }
     } else m[k] = el.value;
     tr.querySelector("[data-out]").innerHTML = chip(evaluate(m));
     changed();
@@ -660,6 +854,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
   $("band-std").addEventListener("input", (e) => { const n = parseFloat(e.target.value); if (isFinite(n)) { state.bandStd = n / 100; changed(); refreshChips(); } });
   $("band-alt").addEventListener("input", (e) => { const n = parseFloat(e.target.value); if (isFinite(n)) { state.bandAlt = n / 100; changed(); refreshChips(); } });
   $("asof-input").addEventListener("input", (e) => { state.asOf = e.target.value; changed(); });
+  $("stale-days").addEventListener("input", (e) => { const n = parseInt(e.target.value, 10); if (n > 0) { state.staleDays = n; changed(); } });
   function refreshChips() {
     document.querySelectorAll("#sheet-body tr[data-s]").forEach((tr) => {
       tr.querySelector("[data-out]").innerHTML = chip(evaluate(state.sections[+tr.dataset.s].metrics[+tr.dataset.m]));
@@ -685,6 +880,17 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
       hb.setAttribute("aria-expanded", String(open));
       hb.textContent = open ? "Hide method" : "How it's measured";
       box.hidden = !open;
+      open ? openHow.add(hb.dataset.how) : openHow.delete(hb.dataset.how);
+      return;
+    }
+    const ab = ev.target.closest("[data-act]");
+    if (ab) {
+      setTab("cockpit");
+      const m = findMetric(ab.dataset.act);
+      $("act-metric").value = ab.dataset.act;
+      if (m && !$("act-owner").value) $("act-owner").value = m.owner || "";
+      $("actions-panel").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+      $("act-text").focus({ preventScroll: true });
       return;
     }
     const j = ev.target.closest("[data-jump]");
@@ -717,12 +923,14 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     if (!api) {
       published = JSON.stringify(state);
       store.set("crepes-cockpit-local", body);
+      await recordSnapshot();
       changed();
       toast("Saved in this browser. Open the published cockpit to save for everyone.");
     } else {
       try {
         await api.publish({ [DATA_FILE]: { content: body, contentType: "application/json" } });
         published = JSON.stringify(state);
+        await recordSnapshot();
         changed();
         toast("Saved. Everyone opening the cockpit now sees these numbers.");
       } catch (err) {
@@ -738,6 +946,30 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     }
     btn.disabled = false; btn.textContent = "Save for everyone";
   });
+
+  async function recordSnapshot() {
+    const snap = snapshotOf(state);
+    if (db) {
+      try { await db.collection("snapshots").doc(snap.date).set(snap); }
+      catch { toast("Numbers saved, but today's trend point didn't record. Save again to retry."); }
+      return;
+    }
+    snapshots = snapshots.filter((s) => s.date !== snap.date).concat(snap);
+    store.set(HIST_KEY, JSON.stringify(snapshots));
+  }
+
+  async function connectStore() {
+    try { db = window.claude?.use ? await window.claude.use("db") : null; } catch { db = null; }
+    if (!db) {
+      try { snapshots = JSON.parse(store.get(HIST_KEY) || "[]"); } catch { snapshots = []; }
+      try { actions = JSON.parse(store.get(ACT_KEY) || "[]"); } catch { actions = []; }
+      $("actions-note").textContent = "Actions and history are kept in this browser only. Open the published cockpit to share them.";
+      renderCockpit();
+      return;
+    }
+    db.collection("snapshots").limit(1000).onSnapshot((qs) => { snapshots = qs.docs.map((d) => d.data()); renderCockpit(); }, () => {});
+    db.collection("actions").limit(1000).onSnapshot((qs) => { actions = qs.docs.map((d) => ({ id: d.id, ...d.data() })); renderCockpit(); }, () => { $("actions-note").textContent = "Actions couldn't load. Reload the page to try again."; });
+  }
 
   /* ---------- xlsx import / export ---------- */
   function guessFormat(cell, prev) {
@@ -787,6 +1019,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
         owner: String(val(r, 5) || ""),
         note: [val(r, 6), val(r, 7), val(r, 10)].filter((x) => x !== "" && x != null).join(" · "),
         format: guessFormat(cell(r, 1), prev?.format),
+        asOf: prev && String(prev.value) === String(value) ? prev.asOf || "" : today(),
         auto: prev ? prev.auto !== false : true,
       });
       // A typed status next to numbers the rule can judge: let the numbers decide, as the cockpit does.
@@ -890,6 +1123,7 @@ table.sheet { border-collapse: collapse; width: 100%; min-width: 1280px; font-si
     } catch {}
     renderEditor();
     changed();
+    connectStore();
     const tab = store.get("crepes-cockpit-tab");
     if (location.hash === "#edit" || location.hash === "#leaders") setTab(location.hash.slice(1));
     else if (tab === "edit" || tab === "leaders") setTab(tab);
